@@ -1,1 +1,1122 @@
 
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رام آنلاین | RAMIN JAVAHER</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+ --gold:#b18a50;--dark:#30271f;--cream:#fbf8f1;
+ --muted:#887d70;--line:#eee5d7;--soft:#f5efe5;
+ --green:#28734e;--red:#b64242;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--dark);font-family:Vazirmatn,Tahoma,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;transition:.2s}
+button:disabled{opacity:.5;cursor:not-allowed}
+a{color:inherit}
+.wrap{width:min(1160px,92%);margin:auto}
+.top{background:var(--dark);color:#f7e9d0;text-align:center;padding:9px 12px;font-size:12px}
+.header{position:sticky;top:0;z-index:5;background:#fffdf9ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.head{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-size:20px;font-weight:800;color:#8c6938;line-height:1.6}
+.brand small{display:block;font-size:10px;letter-spacing:4px;color:#a58b65;direction:ltr;text-align:right}
+.head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:11px 17px;background:linear-gradient(135deg,#c5a36d,#9c743d);color:white;font-weight:700;box-shadow:0 5px 14px #a9854a24}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.btn.dark{background:var(--dark)}
+.btn.light{background:#f1e8d9;color:#6e5431;box-shadow:none}
+.btn.red{background:var(--red)}
+.btn.green{background:var(--green)}
+.btn.outline{background:transparent;color:var(--gold);border:1px solid var(--gold);box-shadow:none}
+.hero{margin-top:22px;min-height:360px;border-radius:26px;overflow:hidden;position:relative;display:flex;align-items:center;padding:clamp(22px,5vw,55px);color:white;background:linear-gradient(90deg,#21180fcf,#21180f20),url('https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg') center/cover}
+.hero-content{max-width:520px}
+.hero-tag{display:inline-block;padding:7px 13px;border:1px solid #ffffff75;border-radius:30px;font-size:12px;margin-bottom:13px}
+.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.5;margin:0 0 8px}
+.hero p{font-size:15px;color:#f6ead9;line-height:2;margin:0 0 22px}
+.hero .btn{background:#d0ad74;color:#30271f}
+.section{padding:35px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:17px}
+.section-title{font-size:22px;margin:0}
+.section-sub{font-size:12px;color:var(--muted);margin:5px 0 0}
+.title-line{width:45px;height:3px;background:var(--gold);border-radius:5px;margin-top:9px}
+.categories{display:flex;gap:9px;overflow:auto;padding:5px 1px 14px}
+.cat{white-space:nowrap;border:1px solid var(--line);background:white;color:#675847;border-radius:30px;padding:10px 17px;font-size:13px}
+.cat.active,.cat:hover{background:var(--dark);color:white;border-color:var(--dark)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
+.product{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:.25s}
+.product:hover{transform:translateY(-4px);box-shadow:0 12px 30px #46351c12}
+.product-image{height:220px;background:#f3ede3;overflow:hidden}
+.product-image img{width:100%;height:100%;object-fit:cover;display:block;transition:.4s}
+.product:hover img{transform:scale(1.045)}
+.product-body{padding:14px}
+.product h3{font-size:14px;margin:0 0 10px;min-height:24px}
+.price{font-size:15px;font-weight:800;color:#97713e}
+.old{font-size:11px;color:#aaa;text-decoration:line-through;margin-right:5px;font-weight:400}
+.stock{font-size:11px;color:var(--green);margin:9px 0}
+.stock.out{color:var(--red)}
+.product-body .btn{width:100%;padding:10px;font-size:12px}
+.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed var(--line);border-radius:15px;grid-column:1/-1}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:10px 0 25px}
+.benefit{background:white;border:1px solid var(--line);border-radius:15px;padding:17px;text-align:center}
+.benefit b{display:block;font-size:14px;margin-bottom:4px}
+.benefit span{font-size:11px;color:var(--muted)}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin:15px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin:9px 0;flex:1;min-width:140px;font-size:13px}
+.field input,.field select,.field textarea{border:1px solid #e5dccf;border-radius:11px;padding:11px;background:#fffdfa;width:100%;outline:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px #b18a5018}
+.field textarea{min-height:80px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hidden{display:none!important}
+.muted,.small{color:var(--muted)}
+.small{font-size:11px}
+.notice{padding:12px;border-radius:11px;background:var(--soft);margin:10px 0;font-size:13px}
+.notice.error{background:#fff0ef;color:#a52e2e}
+.notice.ok{background:#eaf7ef;color:#23633f}
+.footer{background:var(--dark);color:#f7ead7;margin-top:45px;padding:32px 0;text-align:center;line-height:2.4;font-size:13px}
+.footer a{color:#e5c995;text-decoration:none}
+.footer a:hover{text-decoration:underline}
+.footer-brand{font-size:20px;font-weight:800;color:#e1c18b}
+.footer hr{border:0;border-top:1px solid #ffffff20;margin:18px 0}
+.modal{position:fixed;inset:0;background:#17120dcc;z-index:20;display:flex;align-items:center;justify-content:center;padding:12px}
+.modalbox{background:var(--cream);border-radius:20px;padding:19px;width:min(540px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 70px #0004}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.modal-head h3{margin:0}
+.cartline{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:12px 0}
+.cartline button{padding:5px 10px}
+.cart-total{background:var(--soft);padding:13px;border-radius:12px;margin:14px 0;font-weight:800;line-height:2.2}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.tabs button{border:0;background:var(--soft);border-radius:10px;padding:10px 14px;color:var(--dark)}
+.tabs button.active{background:var(--dark);color:white}
+.admin-product,.order-card{background:#fffdfa;border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0}
+.admin-product img{width:60px;height:60px;object-fit:cover;border-radius:10px}
+.grow{flex:1;min-width:130px}
+.badge{display:inline-block;padding:4px 10px;border-radius:30px;background:#eee5d8;font-size:11px}
+.details{background:#f5f0e7;border-radius:12px;padding:13px;margin-top:12px;overflow:auto}
+.order-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.order-actions select{padding:9px;border:1px solid var(--line);border-radius:9px}
+.tracking-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.tracking-row .field{min-width:180px}
+.order-item-image{width:58px;height:58px;object-fit:cover;border-radius:9px;background:#eee}
+.order-table{width:100%;border-collapse:collapse;text-align:right;min-width:480px}
+.order-table th,.order-table td{padding:9px;border-bottom:1px solid #e6ddcf;vertical-align:middle;font-size:12px}
+.shipping-box{background:#f5efe5;padding:12px;border-radius:12px;margin-top:12px}
+.shipping-box .field{max-width:220px}
+@media(max-width:850px){
+ .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .product-image{height:195px}
+}
+@media(max-width:600px){
+ .head{padding:10px 0;align-items:center;flex-wrap:wrap}
+ .brand{font-size:15px}
+ .brand small{font-size:9px}
+ .head-actions{gap:5px;justify-content:flex-end;width:100%}
+ .head-actions .btn{padding:8px 9px;font-size:11px;border-radius:9px}
+ .head-actions .admin-link{display:inline-block}
+ .hero{min-height:280px;margin-top:14px;border-radius:19px;background-position:60% center}
+ .hero h1{font-size:31px}
+ .hero p{font-size:13px}
+ .section{padding:25px 0}
+ .section-title{font-size:19px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .product{border-radius:14px}
+ .product-image{height:170px}
+ .product-body{padding:10px}
+ .product h3{font-size:13px}
+ .price{font-size:13px}
+ .product-body .btn{padding:9px 5px;font-size:11px}
+ .benefits{gap:7px}
+ .benefit{padding:12px 5px}
+ .benefit b{font-size:11px}
+ .benefit span{font-size:10px}
+ .panel{padding:13px}
+ .order-actions>*{max-width:100%}
+}
+@media(max-width:360px){
+ .product-image{height:145px}
+ .brand{font-size:13px}
+ .head-actions .btn{font-size:10px;padding:7px}
+}
+</style>
+</head>
+<body>
+
+<div class="top">✨ زیبایی در جزئیات است | ارسال سفارش به سراسر کشور ✨</div>
+
+<header class="header">
+ <div class="wrap head">
+  <div class="brand">فروشگاه بدلیجات رام آنلاین<small>RAMIN JAVAHER</small></div>
+  <div class="head-actions">
+   <button class="btn" id="cartOpen">سبد خرید <span id="cartCount">۰</span></button>
+   <button class="btn light" onclick="document.getElementById('trackingSection').scrollIntoView({behavior:'smooth'})">پیگیری سفارش</button>
+   <button class="btn outline admin-link" id="adminOpen">مدیریت</button>
+  </div>
+ </div>
+</header>
+
+<main class="wrap">
+ <section class="hero">
+  <div class="hero-content">
+   <span class="hero-tag">RAMIN JAVAHER COLLECTION</span>
+   <h1>زیبایی، به سبک شما</h1>
+   <p>زیورآلاتی خاص برای لحظه‌هایی که می‌خواهید متفاوت بدرخشید.</p>
+   <button class="btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">مشاهده محصولات ←</button>
+  </div>
+ </section>
+
+ <section class="benefits">
+  <div class="benefit"><b>✦ انتخاب خاص</b><span>محصولات زیبا و متنوع</span></div>
+  <div class="benefit"><b>✦ خرید آسان</b><span>ثبت سفارش آنلاین</span></div>
+  <div class="benefit"><b>✦ ارسال سراسری</b><span>ارسال به سراسر کشور</span></div>
+ </section>
+
+ <section class="section" id="shop">
+  <div class="section-head">
+   <div><h2 class="section-title">دسته‌بندی محصولات</h2><div class="title-line"></div></div>
+  </div>
+  <div id="categories" class="categories">
+   <button class="cat active" data-filter="all">همه محصولات</button>
+  </div>
+  <div class="section-head" style="margin-top:14px">
+   <div><h2 class="section-title">محصولات فروشگاه</h2><p class="section-sub">زیبایی را به استایل خود اضافه کنید</p></div>
+  </div>
+  <div id="products" class="grid"><div class="empty">در حال دریافت محصولات...</div></div>
+ </section>
+
+ <section class="section" id="trackingSection">
+  <div class="section-head"><div><h2 class="section-title">پیگیری سفارش</h2><div class="title-line"></div></div></div>
+  <p class="muted small">شماره سفارش و شماره موبایلی را وارد کنید که هنگام ثبت سفارش استفاده کرده‌اید.</p>
+  <div class="panel">
+   <form id="trackingForm">
+    <div class="row">
+     <label class="field">شماره سفارش<input id="trackOrderId" inputmode="numeric" required placeholder="مثلاً ۱۲۳"></label>
+     <label class="field">شماره موبایل<input id="trackMobile" inputmode="tel" required maxlength="11" placeholder="09xxxxxxxxx"></label>
+    </div>
+    <button class="btn" type="submit" id="trackBtn">نمایش وضعیت سفارش</button>
+    <div id="trackingResult"></div>
+   </form>
+  </div>
+ </section>
+
+ <section id="adminPanel" class="panel hidden">
+  <div class="row" style="justify-content:space-between">
+   <h2 class="section-title">پنل مدیریت فروشگاه</h2>
+   <button class="btn light" id="logoutBtn">خروج</button>
+  </div>
+  <div class="tabs">
+   <button class="active" data-tab="productTab">مدیریت محصولات</button>
+   <button data-tab="ordersTab">سفارش‌ها</button>
+   <button data-tab="shippingTab">تنظیمات ارسال</button>
+  </div>
+
+  <div id="productTab">
+   <h3>ثبت محصول جدید</h3>
+   <form id="productForm">
+    <input type="hidden" id="editId">
+    <div class="row">
+     <label class="field">نام محصول<input id="pName" required></label>
+     <label class="field">کد محصول<input id="pCode"></label>
+    </div>
+    <div class="row">
+     <label class="field">دسته‌بندی<select id="pCategory" required></select></label>
+     <label class="field">قیمت فروش (تومان)<input id="pPrice" type="number" min="0" required></label>
+     <label class="field">قیمت با تخفیف<input id="pDiscount" type="number" min="0"></label>
+    </div>
+    <div class="row">
+     <label class="field">موجودی<input id="pStock" type="number" min="0" value="1" required></label>
+     <label class="field">قیمت خرید<input id="pPurchase" type="number" min="0"></label>
+     <label class="field">تصویر محصول<input id="pImage" type="file" accept="image/png,image/jpeg,image/webp"></label>
+    </div>
+    <label class="field">توضیحات<textarea id="pDescription"></textarea></label>
+    <div class="row">
+     <button class="btn" type="submit" id="saveProductBtn">ذخیره محصول</button>
+     <button class="btn light hidden" type="button" id="cancelEdit">لغو ویرایش</button>
+    </div>
+    <div id="productMsg"></div>
+   </form>
+   <h3>فهرست محصولات</h3>
+   <div id="adminProducts"></div>
+  </div>
+
+  <div id="ordersTab" class="hidden">
+   <h3>مدیریت سفارش‌ها</h3>
+   <button class="btn" id="refreshOrders">به‌روزرسانی سفارش‌ها</button>
+   <div id="adminOrders"></div>
+  </div>
+
+  <div id="shippingTab" class="hidden">
+   <h3>تنظیمات هزینه ارسال</h3>
+   <p class="small muted">این مبلغ برای سفارش‌های جدید استفاده می‌شود. هزینه سفارش‌های قبلی با این تغییر عوض نمی‌شود.</p>
+   <div class="panel">
+    <label class="field">هزینه ارسال پیش‌فرض (تومان)
+     <input id="defaultShippingCost" type="number" min="0" step="1000" value="170000">
+    </label>
+    <button class="btn" id="saveShippingBtn">ذخیره هزینه ارسال</button>
+    <div id="shippingMsg"></div>
+   </div>
+   <div class="notice">برای تغییر هزینه ارسال یک سفارش مشخص، به بخش «سفارش‌ها» بروید و مبلغ همان سفارش را جداگانه ثبت کنید.</div>
+  </div>
+ </section>
+</main>
+
+<footer class="footer">
+ <div class="wrap">
+  <div class="footer-brand">رام آنلاین | RAMIN JAVAHER</div>
+  فروشگاه بدلیجات رام آنلاین<br>
+  مدیریت: رامین محمدی گلوسنگ<br>
+  آذربایجان شرقی، شهرستان کلیبر، خیابان معلم<br>
+  موبایل: 09387893112 | تلفن: 04144446002
+  <hr>
+  واتساپ: <a href="https://wa.me/989148023112" target="_blank" rel="noopener">09148023112</a><br>
+  اینستاگرام: <a href="https://www.instagram.com/ramin_javaherkaleybar/" target="_blank" rel="noopener">ramin_javaherkaleybar</a><br>
+  تلگرام: <a href="https://t.me/ramin_javaherkaleybar/" target="_blank" rel="noopener">ramin_javaherkaleybar</a>
+  <hr>
+  <span class="small">تمام حقوق برای فروشگاه رام آنلاین محفوظ است.</span>
+ </div>
+</footer>
+
+<div id="cartModal" class="modal hidden">
+ <div class="modalbox">
+  <div class="modal-head"><h3>🛍 سبد خرید</h3><button class="btn light" id="cartClose">بستن</button></div>
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal"></div>
+  <h3>اطلاعات ارسال سفارش</h3>
+  <form id="checkoutForm">
+   <label class="field">نام و نام خانوادگی<input id="cName" required></label>
+   <label class="field">شماره موبایل<input id="cMobile" inputmode="tel" required placeholder="09xxxxxxxxx"></label>
+   <label class="field">استان<input id="cProvince" required></label>
+   <label class="field">شهر<input id="cCity" required></label>
+   <label class="field">آدرس کامل<textarea id="cAddress" required></textarea></label>
+   <label class="field">کد پستی<input id="cPostal"></label>
+   <label class="field">توضیحات سفارش<textarea id="cNote"></textarea></label>
+   <button class="btn" type="submit" id="checkoutBtn">ثبت نهایی سفارش</button>
+   <div id="checkoutMsg"></div>
+   <div id="orderSuccess" class="notice ok hidden"></div>
+  </form>
+ </div>
+</div>
+
+<div id="loginModal" class="modal hidden">
+ <div class="modalbox">
+  <div class="modal-head"><h3>ورود مدیر فروشگاه</h3><button class="btn light" id="loginClose">بستن</button></div>
+  <form id="loginForm">
+   <label class="field">ایمیل<input id="loginEmail" type="email" required></label>
+   <label class="field">رمز عبور<input id="loginPassword" type="password" required></label>
+   <button class="btn">ورود به پنل مدیریت</button>
+   <div id="loginMsg"></div>
+  </form>
+ </div>
+</div>
+
+<script>
+'use strict';
+
+const SUPABASE_URL='https://pbexlgscthtasixhtljd.supabase.co';
+const SUPABASE_KEY='sb_publishable_m3bQ0jW52reNcEBzgVLjeQ_aU7p4jnT';
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+
+let categories=[],products=[],adminProducts=[],cart=[],adminOrders=[];
+let currentFilter='all',isAdmin=false;
+let defaultShippingCost=170000;
+
+const money=n=>Number(n||0).toLocaleString('fa-IR')+' تومان';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const msg=(id,text,type='')=>{$(id).innerHTML=text?`<div class="notice ${type}">${esc(text)}</div>`:''};
+const errText=e=>e?.message||e?.error_description||String(e||'خطای نامشخص');
+
+function normalizeDigits(value){
+ return String(value||'')
+  .replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+  .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+}
+function categoryName(p){
+ return categories.find(c=>String(c.id)===String(p.category_id))?.name||'بدون دسته‌بندی';
+}
+function productPrice(p){
+ return Number(p.discount_price)>0?Number(p.discount_price):Number(p.sale_price);
+}
+function cartSubtotal(){
+ return cart.reduce((a,x)=>a+x.price*x.qty,0);
+}
+function getOrderSubtotal(order){
+ return (order.items||[]).reduce((sum,item)=>sum+Number(item.quantity||0)*Number(item.unit_price||0),0);
+}
+function validMoney(value){
+ const n=Number(normalizeDigits(value));
+ return Number.isFinite(n)&&n>=0?n:null;
+}
+
+async function init(){
+ await loadCategories();
+ await loadProducts();
+ await loadShippingSettings();
+ renderCart();
+ const {data:{session}}=await db.auth.getSession();
+ if(session)await verifyAdmin(false);
+}
+
+async function loadCategories(){
+ const {data,error}=await db.from('categories').select('id,name').order('id');
+ if(error){
+  console.error(error);
+  msg('productMsg','خطا در دریافت دسته‌بندی‌ها: '+errText(error),'error');
+  return;
+ }
+ categories=data||[];
+ $('categories').innerHTML='<button class="cat active" data-filter="all">همه محصولات</button>'+
+  categories.map(c=>`<button class="cat" data-filter="${esc(c.id)}">${esc(c.name)}</button>`).join('');
+ $('pCategory').innerHTML=categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+}
+
+$('categories').addEventListener('click',e=>{
+ const b=e.target.closest('[data-filter]');
+ if(!b)return;
+ currentFilter=b.dataset.filter;
+ $('categories').querySelectorAll('.cat').forEach(x=>x.classList.toggle('active',x===b));
+ renderProducts();
+});
+
+async function loadProducts(){
+ const {data,error}=await db.from('catalog_products').select('*').order('created_at',{ascending:false});
+ if(error){
+  $('products').innerHTML='<div class="empty">خطا در دریافت محصولات. اتصال و دسترسی catalog_products را بررسی کنید.</div>';
+  console.error(error);
+  return;
+ }
+ products=data||[];
+ renderProducts();
+}
+
+function renderProducts(){
+ const list=currentFilter==='all'?products:products.filter(p=>String(p.category_id)===String(currentFilter));
+ $('products').innerHTML=list.length?list.map(p=>{
+  const stock=Number(p.stock||0);
+  return `<article class="product">
+   <div class="product-image"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" onerror="this.style.display='none'"></div>
+   <div class="product-body">
+    <h3>${esc(p.name)}</h3>
+    <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
+    <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد باقی‌مانده`:'ناموجود'}</div>
+    <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${Number(p.id)})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
+   </div>
+  </article>`;
+ }).join(''):'<div class="empty">در این دسته محصولی ثبت نشده است.</div>';
+}
+
+function addToCart(id){
+ const p=products.find(x=>Number(x.id)===Number(id));
+ if(!p)return;
+ const stock=Number(p.stock||0);
+ if(stock<=0){alert('این محصول ناموجود است.');return}
+ const item=cart.find(x=>Number(x.id)===Number(id));
+ if(item){
+  if(item.qty>=stock){alert('بیشتر از موجودی انبار نمی‌توانید انتخاب کنید.');return}
+  item.qty++;
+ }else{
+  cart.push({id:p.id,name:p.name,price:productPrice(p),qty:1,stock});
+ }
+ renderCart();
+}
+
+function renderCart(){
+ $('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0).toLocaleString('fa-IR');
+ $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartline">
+  <div><b>${esc(x.name)}</b><div class="small">${money(x.price)} × ${x.qty}</div></div>
+  <div class="row">
+   <button class="btn light" onclick="changeQty(${Number(x.id)},-1)">−</button>
+   ${x.qty}
+   <button class="btn light" onclick="changeQty(${Number(x.id)},1)">+</button>
+   <button class="btn red" onclick="removeCart(${Number(x.id)})">×</button>
+  </div>
+ </div>`).join(''):'<div class="empty">سبد خرید شما خالی است.</div>';
+
+ const subtotal=cartSubtotal();
+ const shipping=cart.length?defaultShippingCost:0;
+ $('cartTotal').innerHTML=`
+  <div>جمع محصولات: ${money(subtotal)}</div>
+  <div>هزینه ارسال: ${money(shipping)}</div>
+  <div style="border-top:1px solid #dfd2bf;margin-top:7px;padding-top:7px">مبلغ قابل پرداخت: ${money(subtotal+shipping)}</div>`;
+}
+
+function changeQty(id,d){
+ const x=cart.find(a=>Number(a.id)===Number(id));
+ if(!x)return;
+ const p=products.find(a=>Number(a.id)===Number(id));
+ const stock=Number(p?.stock??x.stock??0);
+ if(d>0&&x.qty>=stock){alert('موجودی کافی نیست.');return}
+ x.qty+=d;
+ if(x.qty<=0)removeCart(id);
+ else renderCart();
+}
+function removeCart(id){
+ cart=cart.filter(x=>Number(x.id)!==Number(id));
+ renderCart();
+}
+
+$('cartOpen').onclick=()=>{
+ $('cartModal').classList.remove('hidden');
+ renderCart();
+};
+$('cartClose').onclick=()=>$('cartModal').classList.add('hidden');
+
+async function loadShippingSettings(){
+ try{
+  const {data,error}=await db.from('store_settings')
+   .select('default_shipping_cost').eq('singleton',true).maybeSingle();
+  if(error)throw error;
+  if(data&&data.default_shipping_cost!==null){
+   defaultShippingCost=Number(data.default_shipping_cost);
+  }else{
+   defaultShippingCost=170000;
+  }
+  if($('defaultShippingCost'))$('defaultShippingCost').value=defaultShippingCost;
+  renderCart();
+ }catch(error){
+  console.error('Shipping settings:',error);
+  defaultShippingCost=170000;
+  if($('defaultShippingCost'))$('defaultShippingCost').value=defaultShippingCost;
+  renderCart();
+ }
+}
+
+$('saveShippingBtn').onclick=async()=>{
+ try{
+  await requireAdmin();
+  const value=validMoney($('defaultShippingCost').value);
+  if(value===null)throw new Error('هزینه ارسال باید عدد صفر یا بیشتر باشد.');
+  $('saveShippingBtn').disabled=true;
+  const {data,error}=await db.from('store_settings')
+   .update({default_shipping_cost:value,updated_at:new Date().toISOString()})
+   .eq('singleton',true)
+   .select('default_shipping_cost')
+   .maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error('تنظیمات ذخیره نشد. دسترسی مدیر به جدول store_settings را بررسی کنید.');
+  defaultShippingCost=Number(data.default_shipping_cost);
+  renderCart();
+  msg('shippingMsg','هزینه ارسال پیش‌فرض با موفقیت ذخیره شد.','ok');
+ }catch(error){
+  console.error(error);
+  msg('shippingMsg','خطا در ذخیره هزینه ارسال: '+errText(error),'error');
+ }finally{
+  $('saveShippingBtn').disabled=false;
+ }
+};
+
+$('checkoutForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!cart.length){
+  msg('checkoutMsg','سبد خرید خالی است.','error');
+  return;
+ }
+ const mobile=normalizeDigits($('cMobile').value).replace(/\s/g,'');
+ if(!/^09\d{9}$/.test(mobile)){
+  msg('checkoutMsg','شماره موبایل باید با 09 شروع شود و 11 رقم باشد.','error');
+  return;
+ }
+ const submit=$('checkoutBtn');
+ submit.disabled=true;
+ $('orderSuccess').classList.add('hidden');
+
+ try{
+  msg('checkoutMsg','در حال بررسی موجودی انبار...');
+  const ids=cart.map(x=>x.id);
+  const {data:latest,error:checkError}=await db.from('catalog_products')
+   .select('id,name,stock').in('id',ids);
+  if(checkError)throw checkError;
+
+  for(const item of cart){
+   const p=(latest||[]).find(x=>Number(x.id)===Number(item.id));
+   if(!p||Number(p.stock||0)<item.qty){
+    await loadProducts();
+    throw new Error('موجودی محصول '+item.name+' کافی نیست. سبد خرید را اصلاح کنید.');
+   }
+  }
+
+  const payload={
+   p_full_name:$('cName').value.trim(),
+   p_mobile:mobile,
+   p_province:$('cProvince').value.trim(),
+   p_city:$('cCity').value.trim(),
+   p_address:$('cAddress').value.trim(),
+   p_postal_code:$('cPostal').value.trim(),
+   p_items:cart.map(x=>({id:x.id,quantity:x.qty}))
+  };
+
+  const subtotal=cartSubtotal();
+  msg('checkoutMsg','در حال ثبت سفارش...');
+  const {data,error}=await db.rpc('create_store_order',payload);
+  if(error)throw error;
+
+  const result=Array.isArray(data)?data[0]:data;
+  if(!result||result.success===false){
+   throw new Error(result?.message||'پاسخ ثبت سفارش معتبر نیست.');
+  }
+
+  const orderId=result.order_id??result.id??result.orderId;
+  const savedShipping=Number(result.shipping_cost??defaultShippingCost);
+  const savedTotal=Number(result.total_amount??(subtotal+savedShipping));
+  const lines=cart.map(x=>`${x.name} × ${x.qty} - ${money(x.price*x.qty)}`).join('\n');
+
+  const wa=`سلام، سفارش جدید در سایت رام ثبت شد.
+شماره سفارش: ${orderId??'ثبت‌شده'}
+نام: ${payload.p_full_name}
+موبایل: ${mobile}
+استان: ${payload.p_province}
+شهر: ${payload.p_city}
+آدرس: ${payload.p_address}
+محصولات:
+${lines}
+جمع محصولات: ${money(Number(result.items_total??subtotal))}
+هزینه ارسال: ${money(savedShipping)}
+مبلغ نهایی: ${money(savedTotal)}
+توضیحات مشتری: ${$('cNote').value.trim()||'ندارد'}`;
+
+  cart=[];
+  renderCart();
+  $('checkoutForm').reset();
+  msg('checkoutMsg','سفارش شما با موفقیت ثبت شد.','ok');
+
+  if(orderId!==undefined&&orderId!==null){
+   $('orderSuccess').classList.remove('hidden');
+   $('orderSuccess').innerHTML=`سفارش شما با موفقیت ثبت شد.<br>
+    شماره سفارش: <b>${esc(orderId)}</b><br>
+    جمع محصولات: ${money(Number(result.items_total??subtotal))}<br>
+    هزینه ارسال: ${money(savedShipping)}<br>
+    مبلغ نهایی: <b>${money(savedTotal)}</b><br>
+    این شماره را برای پیگیری نگه دارید.`;
+  }
+
+  await loadProducts();
+
+  const whatsappUrl='https://wa.me/989148023112?text='+encodeURIComponent(wa);
+  window.open(whatsappUrl,'_blank');
+ }catch(error){
+  console.error(error);
+  msg('checkoutMsg','ثبت سفارش انجام نشد: '+errText(error),'error');
+ }finally{
+  submit.disabled=false;
+ }
+});
+
+$('trackingForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const orderId=Number(normalizeDigits($('trackOrderId').value).trim());
+ const mobile=normalizeDigits($('trackMobile').value).replace(/\D/g,'');
+ if(!Number.isSafeInteger(orderId)||orderId<=0){
+  msg('trackingResult','شماره سفارش معتبر نیست.','error');
+  return;
+ }
+ if(!/^09\d{9}$/.test(mobile)){
+  msg('trackingResult','شماره موبایل باید ۱۱ رقم و با 09 شروع شود.','error');
+  return;
+ }
+
+ const btn=$('trackBtn');
+ btn.disabled=true;
+ msg('trackingResult','در حال بررسی سفارش...');
+ try{
+  const {data,error}=await db.rpc('track_store_order',{p_order_id:orderId,p_mobile:mobile});
+  if(error)throw error;
+  const order=Array.isArray(data)?data[0]:data;
+  if(!order)throw new Error('سفارشی پیدا نشد.');
+
+  const date=order.created_at?new Date(order.created_at).toLocaleString('fa-IR'):'—';
+  $('trackingResult').innerHTML=`<div class="notice ok">
+   <h3>اطلاعات سفارش شماره ${esc(order.id)}</h3>
+   <p><b>وضعیت سفارش:</b> ${esc(statusLabel(order.status))}</p>
+   <p><b>تاریخ ثبت:</b> ${esc(date)}</p>
+   <p><b>هزینه ارسال:</b> ${money(order.shipping_cost)}</p>
+   <p><b>مبلغ نهایی سفارش:</b> ${money(order.total_amount)}</p>
+   <p><b>کد رهگیری پستی:</b> ${order.tracking_code?esc(order.tracking_code):'هنوز ثبت نشده است'}</p>
+  </div>`;
+ }catch(error){
+  console.error(error);
+  msg('trackingResult','سفارش پیدا نشد یا اطلاعات واردشده صحیح نیست.','error');
+ }finally{
+  btn.disabled=false;
+ }
+});
+
+$('adminOpen').onclick=()=>{
+ $('loginModal').classList.remove('hidden');
+ $('loginMsg').innerHTML='';
+};
+$('loginClose').onclick=()=>$('loginModal').classList.add('hidden');
+
+async function verifyAdmin(showError=true){
+ const {data:{user},error}=await db.auth.getUser();
+ if(error||!user){
+  if(showError)msg('loginMsg','ابتدا وارد حساب مدیر شوید.','error');
+  return false;
+ }
+ const {data:profile,error:profileError}=await db.from('profiles')
+  .select('role').eq('id',user.id).maybeSingle();
+ if(profileError||profile?.role!=='admin'){
+  if(showError)msg('loginMsg','این حساب دسترسی مدیر ندارد.','error');
+  return false;
+ }
+ isAdmin=true;
+ $('loginModal').classList.add('hidden');
+ $('adminPanel').classList.remove('hidden');
+ await loadAdminProducts();
+ await loadAdminOrders();
+ await loadShippingSettings();
+ return true;
+}
+
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const b=e.submitter;
+ if(b)b.disabled=true;
+ msg('loginMsg','در حال ورود...');
+ try{
+  const {error}=await db.auth.signInWithPassword({
+   email:$('loginEmail').value.trim(),
+   password:$('loginPassword').value
+  });
+  if(error)throw error;
+  const ok=await verifyAdmin(true);
+  if(!ok)await db.auth.signOut();
+ }catch(error){
+  msg('loginMsg','ورود ناموفق: '+errText(error),'error');
+ }finally{
+  if(b)b.disabled=false;
+ }
+});
+
+$('logoutBtn').onclick=async()=>{
+ await db.auth.signOut();
+ isAdmin=false;
+ $('adminPanel').classList.add('hidden');
+};
+
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));
+ ['productTab','ordersTab','shippingTab'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
+ if(b.dataset.tab==='ordersTab')loadAdminOrders();
+ if(b.dataset.tab==='shippingTab')loadShippingSettings();
+}));
+
+async function requireAdmin(){
+ if(!isAdmin)throw new Error('ابتدا با حساب مدیر وارد شوید.');
+}
+
+async function uploadProductImage(file){
+ if(!file)return null;
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+  throw new Error('فرمت تصویر باید JPG، PNG یا WebP باشد.');
+ }
+ if(file.size>5*1024*1024){
+  throw new Error('حجم تصویر نباید بیشتر از ۵ مگابایت باشد.');
+ }
+ const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+ const path=`products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+ const {error}=await db.storage.from('product-images').upload(path,file,{
+  cacheControl:'3600',upsert:false
+ });
+ if(error)throw error;
+ return db.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+}
+
+$('productForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const btn=$('saveProductBtn');
+ btn.disabled=true;
+ try{
+  await requireAdmin();
+  const id=$('editId').value;
+  const record={
+   name:$('pName').value.trim(),
+   code:$('pCode').value.trim()||null,
+   category_id:Number($('pCategory').value),
+   sale_price:Number($('pPrice').value),
+   discount_price:$('pDiscount').value?Number($('pDiscount').value):null,
+   stock:Number($('pStock').value),
+   purchase_price:$('pPurchase').value?Number($('pPurchase').value):null,
+   description:$('pDescription').value.trim(),
+   is_active:true
+  };
+  const file=$('pImage').files[0];
+  if(file)record.image_url=await uploadProductImage(file);
+
+  if(id){
+   delete record.is_active;
+   const {error}=await db.from('products').update(record).eq('id',id);
+   if(error)throw error;
+  }else{
+   const {error}=await db.from('products').insert(record);
+   if(error)throw error;
+  }
+
+  msg('productMsg',id?'محصول ویرایش شد.':'محصول با موفقیت ثبت شد.','ok');
+  resetProductForm();
+  await loadProducts();
+  await loadAdminProducts();
+ }catch(error){
+  console.error(error);
+  msg('productMsg','خطا: '+errText(error),'error');
+ }finally{
+  btn.disabled=false;
+ }
+});
+
+function resetProductForm(){
+ $('productForm').reset();
+ $('editId').value='';
+ $('pStock').value=1;
+ $('saveProductBtn').textContent='ذخیره محصول';
+ $('cancelEdit').classList.add('hidden');
+}
+$('cancelEdit').onclick=resetProductForm;
+
+async function loadAdminProducts(){
+ try{
+  await requireAdmin();
+  const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
+  if(error)throw error;
+  adminProducts=data||[];
+
+  $('adminProducts').innerHTML=adminProducts.length?adminProducts.map(p=>`
+   <div class="admin-product row">
+    <img src="${esc(p.image_url||'')}" onerror="this.style.display='none'">
+    <div class="grow"><b>${esc(p.name)}</b>
+     <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${Number(p.stock)}</div>
+     <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span>
+    </div>
+    <button class="btn light" onclick="openEdit(${Number(p.id)})">ویرایش</button>
+    <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${Number(p.id)},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
+    <button class="btn red" onclick="deleteProduct(${Number(p.id)})">حذف</button>
+   </div>`).join(''):'<div class="empty">هنوز محصولی ثبت نشده است.</div>';
+ }catch(error){
+  $('adminProducts').innerHTML='<div class="notice error">'+esc(errText(error))+'</div>';
+ }
+}
+
+function openEdit(id){
+ const p=adminProducts.find(x=>String(x.id)===String(id));
+ if(!p){alert('محصول پیدا نشد.');return}
+ $('editId').value=p.id;
+ $('pName').value=p.name||'';
+ $('pCode').value=p.code||'';
+ $('pCategory').value=String(p.category_id??'');
+ $('pPrice').value=p.sale_price??'';
+ $('pDiscount').value=p.discount_price??'';
+ $('pStock').value=p.stock??0;
+ $('pPurchase').value=p.purchase_price??'';
+ $('pDescription').value=p.description||'';
+ $('pImage').value='';
+ $('saveProductBtn').textContent='ذخیره تغییرات';
+ $('cancelEdit').classList.remove('hidden');
+ document.querySelector('[data-tab="productTab"]').click();
+ $('productForm').scrollIntoView({behavior:'smooth'});
+}
+
+async function toggleProduct(id,active){
+ try{
+  await requireAdmin();
+  const {error}=await db.from('products').update({is_active:active}).eq('id',id);
+  if(error)throw error;
+  await loadAdminProducts();
+  await loadProducts();
+ }catch(error){
+  alert('تغییر وضعیت محصول ناموفق بود: '+errText(error));
+ }
+}
+async function deleteProduct(id){
+ if(!confirm('از حذف این محصول مطمئن هستید؟'))return;
+ try{
+  await requireAdmin();
+  const {error}=await db.from('products').delete().eq('id',id);
+  if(error)throw error;
+  await loadAdminProducts();
+  await loadProducts();
+ }catch(error){
+  alert('حذف محصول ناموفق بود: '+errText(error));
+ }
+}
+
+function statusLabel(s){
+ return ({
+  pending:'در انتظار بررسی',
+  confirmed:'تأیید شده',
+  processing:'در حال آماده‌سازی',
+  shipped:'ارسال شده',
+  delivered:'تحویل شده',
+  cancelled:'لغو شده'
+ })[s]||s||'نامشخص';
+}
+
+async function loadAdminOrders(){
+ const box=$('adminOrders');
+ box.innerHTML='<div class="empty">در حال دریافت سفارش‌ها...</div>';
+ try{
+  await requireAdmin();
+  const [ordersR,customersR,itemsR,productsR]=await Promise.all([
+   db.from('orders').select('*').order('created_at',{ascending:false}),
+   db.from('customers').select('*'),
+   db.from('order_items').select('*'),
+   db.from('products').select('id,name,code,image_url')
+  ]);
+  for(const r of [ordersR,customersR,itemsR,productsR]){
+   if(r.error)throw r.error;
+  }
+
+  const customers=customersR.data||[];
+  const items=itemsR.data||[];
+  const prods=productsR.data||[];
+
+  adminOrders=(ordersR.data||[]).map(o=>({
+   ...o,
+   customer:customers.find(c=>String(c.id)===String(o.customer_id))||null,
+   items:items.filter(i=>String(i.order_id)===String(o.id)).map(i=>({
+    ...i,
+    product:prods.find(p=>String(p.id)===String(i.product_id))||null
+   }))
+  }));
+  renderAdminOrders();
+ }catch(error){
+  box.innerHTML='<div class="notice error">دریافت سفارش‌ها ناموفق بود: '+esc(errText(error))+'</div>';
+  console.error(error);
+ }
+}
+
+function renderAdminOrders(){
+ const box=$('adminOrders');
+ if(!adminOrders.length){
+  box.innerHTML='<div class="empty">هنوز سفارشی ثبت نشده است.</div>';
+  return;
+ }
+ box.innerHTML=adminOrders.map(o=>{
+  const c=o.customer||{};
+  const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR'):'—';
+  const subtotal=getOrderSubtotal(o);
+
+  return `<article class="order-card" id="order-card-${esc(o.id)}">
+   <div class="row" style="justify-content:space-between">
+    <b>سفارش شماره ${esc(o.id)}</b>
+    <span class="badge">${esc(statusLabel(o.status))}</span>
+   </div>
+   <div class="small">تاریخ: ${esc(date)} | مشتری: ${esc(c.full_name||'نامشخص')}</div>
+   <div class="small">جمع محصولات: ${money(subtotal)} | هزینه ارسال: ${money(o.shipping_cost)} | مبلغ کل: <b>${money(o.total_amount)}</b></div>
+
+   <div class="shipping-box">
+    <b>تغییر هزینه ارسال همین سفارش</b>
+    <div class="row">
+     <label class="field">هزینه ارسال (تومان)
+      <input id="order-shipping-${esc(o.id)}" type="number" min="0" step="1000" value="${Number(o.shipping_cost||0)}">
+     </label>
+     <button class="btn green" data-action="shipping" data-id="${esc(o.id)}">ذخیره هزینه و مبلغ کل</button>
+    </div>
+    <div class="small">جمع محصولات این سفارش: ${money(subtotal)}</div>
+   </div>
+
+   <div class="order-actions">
+    <button class="btn" data-action="details" data-id="${esc(o.id)}">مشاهده جزئیات</button>
+    <select id="status-${esc(o.id)}">
+     ${[['pending','در انتظار بررسی'],['confirmed','تأیید شده'],['processing','در حال آماده‌سازی'],['shipped','ارسال شده'],['delivered','تحویل شده'],['cancelled','لغو شده']].map(([v,l])=>`<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`).join('')}
+    </select>
+    <button class="btn green" data-action="status" data-id="${esc(o.id)}">ذخیره وضعیت</button>
+   </div>
+
+   <div class="tracking-row">
+    <label class="field">کد رهگیری پستی
+     <input id="tracking-${esc(o.id)}" value="${esc(o.tracking_code||'')}" placeholder="کد رهگیری را وارد کنید">
+    </label>
+    <button class="btn" data-action="tracking" data-id="${esc(o.id)}">ذخیره کد رهگیری</button>
+   </div>
+   <div class="details hidden" id="details-${esc(o.id)}"></div>
+  </article>`;
+ }).join('');
+}
+
+function showOrderDetails(id){
+ const o=adminOrders.find(x=>String(x.id)===String(id));
+ if(!o)return;
+ const area=$('details-'+id);
+ if(!area)return;
+ const c=o.customer||{};
+
+ const rows=(o.items||[]).map(i=>`
+  <tr>
+   <td>${i.product?.image_url?`<img class="order-item-image" src="${esc(i.product.image_url)}" alt="${esc(i.product?.name||'محصول')}">`:'—'}</td>
+   <td>${esc(i.product?.name||('محصول شماره '+i.product_id))}</td>
+   <td>${Number(i.quantity||0).toLocaleString('fa-IR')}</td>
+   <td>${money(i.unit_price)}</td>
+   <td>${money(Number(i.quantity||0)*Number(i.unit_price||0))}</td>
+  </tr>`).join('');
+
+ const subtotal=getOrderSubtotal(o);
+ area.innerHTML=`<h4>جزئیات سفارش ${esc(o.id)}</h4>
+  <p><b>نام مشتری:</b> ${esc(c.full_name||'—')} | <b>موبایل:</b> ${esc(c.mobile||'—')}</p>
+  <p><b>استان و شهر:</b> ${esc(c.province||'—')}، ${esc(c.city||'—')}</p>
+  <p><b>آدرس:</b> ${esc(c.address||'—')}</p>
+  <p><b>کد پستی:</b> ${esc(c.postal_code||'—')}</p>
+  <div style="overflow:auto">
+   <table class="order-table">
+    <thead><tr><th>عکس</th><th>محصول</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5">اقلام سفارش پیدا نشد.</td></tr>'}</tbody>
+   </table>
+  </div>
+  <p><b>جمع محصولات:</b> ${money(subtotal)}</p>
+  <p><b>هزینه ارسال:</b> ${money(o.shipping_cost)}</p>
+  <p><b>مبلغ کل:</b> <b>${money(o.total_amount)}</b></p>
+  <p><b>کد رهگیری پستی:</b> ${esc(o.tracking_code||'هنوز ثبت نشده است')}</p>
+  <p><b>توضیحات:</b> ${esc(o.note||'—')}</p>
+  <button class="btn light" data-action="print" data-id="${esc(o.id)}">چاپ سفارش</button>`;
+
+ area.classList.toggle('hidden');
+}
+
+async function updateOrderShipping(id){
+ try{
+  await requireAdmin();
+  const order=adminOrders.find(o=>String(o.id)===String(id));
+  if(!order)throw new Error('سفارش پیدا نشد.');
+
+  const value=validMoney($('order-shipping-'+id)?.value);
+  if(value===null)throw new Error('هزینه ارسال باید عدد صفر یا بیشتر باشد.');
+
+  const subtotal=getOrderSubtotal(order);
+  const newTotal=subtotal+value;
+
+  const {error}=await db.from('orders').update({
+   shipping_cost:value,
+   total_amount:newTotal
+  }).eq('id',id);
+
+  if(error)throw error;
+
+  order.shipping_cost=value;
+  order.total_amount=newTotal;
+  renderAdminOrders();
+  alert('هزینه ارسال و مبلغ کل سفارش با موفقیت ذخیره شد.');
+ }catch(error){
+  console.error(error);
+  alert('ذخیره هزینه ارسال ناموفق بود: '+errText(error));
+ }
+}
+
+async function updateOrderStatus(id){
+ const value=$('status-'+id)?.value;
+ if(!value)return;
+ try{
+  await requireAdmin();
+  const {error}=await db.from('orders').update({status:value}).eq('id',id);
+  if(error)throw error;
+  const order=adminOrders.find(o=>String(o.id)===String(id));
+  if(order)order.status=value;
+  renderAdminOrders();
+  alert('وضعیت سفارش ذخیره شد.');
+ }catch(error){
+  alert('ذخیره وضعیت انجام نشد: '+errText(error));
+ }
+}
+
+async function updateOrderTracking(id){
+ const input=$('tracking-'+id);
+ if(!input)return;
+ const trackingCode=input.value.trim();
+
+ try{
+  await requireAdmin();
+  const {error}=await db.from('orders').update({
+   tracking_code:trackingCode||null
+  }).eq('id',id);
+  if(error)throw error;
+
+  const order=adminOrders.find(o=>String(o.id)===String(id));
+  if(order)order.tracking_code=trackingCode||null;
+
+  alert('کد رهگیری با موفقیت ذخیره شد.');
+
+  const mobile=order?.customer?.mobile;
+  if(mobile&&trackingCode){
+   const message=`سلام، سفارش شماره ${id} از فروشگاه رام ارسال شد.
+کد رهگیری پستی: ${trackingCode}
+برای پیگیری سفارش به سایت فروشگاه مراجعه کنید.`;
+   if(confirm('آیا پیام کد رهگیری را از طریق واتساپ برای مشتری باز کنیم؟')){
+    window.open('https://wa.me/98'+normalizeDigits(mobile).replace(/\D/g,'').replace(/^0/,'')+'?text='+encodeURIComponent(message),'_blank');
+   }
+  }
+ }catch(error){
+  console.error(error);
+  alert('ذخیره کد رهگیری ناموفق بود: '+errText(error));
+ }
+}
+
+function printOrder(id){
+ const o=adminOrders.find(x=>String(x.id)===String(id));
+ if(!o)return;
+ const c=o.customer||{};
+
+ const rows=(o.items||[]).map(i=>`
+  <tr>
+   <td>${i.product?.image_url?`<img src="${esc(i.product.image_url)}" style="width:65px;height:65px;object-fit:cover;border-radius:8px">`:'—'}</td>
+   <td>${esc(i.product?.name||i.product_id)}</td>
+   <td>${Number(i.quantity)}</td>
+   <td>${money(i.unit_price)}</td>
+   <td>${money(Number(i.quantity)*Number(i.unit_price))}</td>
+  </tr>`).join('');
+
+ const subtotal=getOrderSubtotal(o);
+ const w=window.open('','_blank');
+ if(!w){
+  alert('اجازه باز شدن پنجره چاپ را در مرورگر فعال کنید.');
+  return;
+ }
+
+ w.document.write(`<!doctype html>
+ <html lang="fa" dir="rtl">
+ <meta charset="utf-8">
+ <title>سفارش ${esc(id)}</title>
+ <body style="font-family:Tahoma,Arial;padding:25px;color:#30271f">
+ <h2>فروشگاه بدلیجات رام آنلاین</h2>
+ <p>RAMIN JAVAHER</p>
+ <hr>
+ <h3>فاکتور سفارش شماره ${esc(id)}</h3>
+ <p>مشتری: ${esc(c.full_name||'—')} - موبایل: ${esc(c.mobile||'—')}</p>
+ <p>آدرس: ${esc(c.address||'—')}، ${esc(c.city||'')}</p>
+ <p>استان: ${esc(c.province||'—')} | کد پستی: ${esc(c.postal_code||'—')}</p>
+ <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse;text-align:center">
+ <tr><th>عکس</th><th>محصول</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th></tr>
+ ${rows}
+ </table>
+ <p>جمع محصولات: <b>${money(subtotal)}</b></p>
+ <p>هزینه ارسال: <b>${money(o.shipping_cost)}</b></p>
+ <h3>مبلغ کل: ${money(o.total_amount)}</h3>
+ <p>کد رهگیری پستی: <b>${esc(o.tracking_code||'هنوز ثبت نشده است')}</b></p>
+ <hr>
+ <p style="text-align:center">از خرید شما سپاسگزاریم</p>
+ <script>window.onload=()=>window.print()<\/script>
+ </body></html>`);
+ w.document.close();
+}
+
+$('adminOrders').addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');
+ if(!b)return;
+ const id=b.dataset.id;
+ if(b.dataset.action==='details')showOrderDetails(id);
+ if(b.dataset.action==='status')updateOrderStatus(id);
+ if(b.dataset.action==='print')printOrder(id);
+ if(b.dataset.action==='tracking')updateOrderTracking(id);
+ if(b.dataset.action==='shipping')updateOrderShipping(id);
+});
+
+$('refreshOrders').onclick=loadAdminOrders;
+
+init().catch(e=>{
+ console.error(e);
+ $('products').innerHTML='<div class="empty">خطا در راه‌اندازی فروشگاه. صفحه را دوباره بارگذاری کنید.</div>';
+});
+</script>
+</body>
+</html>
+
