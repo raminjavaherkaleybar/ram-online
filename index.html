@@ -110,6 +110,22 @@ a{color:inherit}
 .order-table th,.order-table td{padding:9px;border-bottom:1px solid #e6ddcf;vertical-align:middle;font-size:12px}
 .shipping-box{background:#f5efe5;padding:12px;border-radius:12px;margin-top:12px}
 .shipping-box .field{max-width:220px}
+
+.product-detail{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin:18px 0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:22px}
+.detail-gallery{min-width:0}
+.detail-main-image{width:100%;height:430px;object-fit:contain;background:#f7f2e9;border-radius:16px;display:block;cursor:zoom-in}
+.detail-thumbs{display:flex;gap:9px;overflow:auto;padding:10px 2px}
+.detail-thumb{width:66px;height:66px;flex:0 0 66px;object-fit:cover;border:2px solid transparent;border-radius:10px;background:#f5efe5;cursor:pointer}
+.detail-thumb.active{border-color:var(--gold)}
+.detail-info{padding:8px 2px;min-width:0}
+.detail-info h2{font-size:22px;line-height:1.8;margin:12px 0}
+.detail-description{font-size:14px;line-height:2.2;color:#6f6559;white-space:pre-line}
+.detail-price{font-size:21px;font-weight:800;color:#97713e;margin:16px 0}
+.detail-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.detail-qty{display:flex;align-items:center;gap:12px;background:var(--soft);padding:7px 12px;border-radius:12px}
+.detail-qty button{border:0;background:white;border-radius:8px;width:32px;height:32px;font-size:18px}
+.detail-back{margin-bottom:12px}
+@media(max-width:700px){.product-detail{grid-template-columns:1fr;padding:12px;gap:10px}.detail-main-image{height:310px}.detail-info h2{font-size:18px}.detail-price{font-size:18px}}
 @media(max-width:850px){
  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
  .product-image{height:195px}
@@ -211,6 +227,7 @@ a{color:inherit}
    <div><h2 class="section-title">محصولات فروشگاه</h2><p class="section-sub">زیبایی را به استایل خود اضافه کنید</p></div>
   </div>
   <div id="products" class="grid"><div class="empty">در حال دریافت محصولات...</div></div>
+  <section id="productDetail" class="hidden" aria-live="polite"></section>
  </section>
 
  <section class="section" id="trackingSection">
@@ -436,16 +453,82 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <div class="product-image"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" onerror="this.style.display='none'"></div>
+   <div class="product-image" role="button" tabindex="0" onclick="openProduct(${Number(p.id)})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProduct(${Number(p.id)})}"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" onerror="this.style.display='none'"></div>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
     <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد باقی‌مانده`:'ناموجود'}</div>
+    <button class="btn light" style="width:100%;margin-bottom:7px" onclick="openProduct(${Number(p.id)})">مشاهده جزئیات و تصاویر</button>
     <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${Number(p.id)})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
    </div>
   </article>`;
  }).join(''):'<div class="empty">در این دسته محصولی ثبت نشده است.</div>';
 }
+
+function productGallery(p){
+ const raw=p.images||p.gallery||p.image_urls||[];
+ let extra=[];
+ try{extra=Array.isArray(raw)?raw:(typeof raw==='string'?(raw.trim().startsWith('[')?JSON.parse(raw):raw.split(/[,\n]/)):[])}catch(e){extra=[]}
+ const urls=[p.image_url,...extra].map(x=>typeof x==='string'?x:(x?.url||x?.image_url||'')).filter(Boolean);
+ return [...new Set(urls)];
+}
+function openProduct(id){
+ const p=products.find(x=>String(x.id)===String(id));
+ if(!p)return;
+ const stock=Number(p.stock||0),images=productGallery(p);
+ const detail=$('productDetail');
+ const description=p.description||p.details||p.short_description||'برای اطلاع از جزئیات بیشتر این محصول، می‌توانید آن را به سبد خرید اضافه کنید یا با فروشگاه تماس بگیرید.';
+ detail.innerHTML=`<button class="btn light detail-back" onclick="closeProduct()">→ بازگشت به محصولات</button>
+  <div class="product-detail">
+   <div class="detail-gallery">
+    <img id="detailMainImage" class="detail-main-image" src="${esc(images[0]||'')}" alt="${esc(p.name)}" onclick="window.open(this.src,'_blank','noopener')" onerror="this.style.display='none'">
+    <div class="detail-thumbs">${images.map((url,i)=>`<img class="detail-thumb ${i===0?'active':''}" src="${esc(url)}" alt="تصویر ${i+1}" data-url="${esc(url)}" onclick="selectDetailImage(this)">`).join('')}</div>
+   </div>
+   <div class="detail-info">
+    <span class="badge">${esc(categoryName(p))}</span>
+    <h2>${esc(p.name)}</h2>
+    <div class="detail-price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
+    <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد`:'در حال حاضر ناموجود'}</div>
+    <div class="detail-description">${esc(description)}</div>
+    <div class="detail-actions">
+     <div class="detail-qty"><button type="button" onclick="changeDetailQty(-1)">−</button><b id="detailQty">۱</b><button type="button" onclick="changeDetailQty(1,${stock})">+</button></div>
+     <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart(${Number(p.id)})">افزودن به سبد خرید</button>
+    </div>
+   </div>
+  </div>`;
+ $('products').classList.add('hidden');
+ $('categories').classList.add('hidden');
+ detail.classList.remove('hidden');
+ history.pushState({productId:String(p.id)},'',`#product-${encodeURIComponent(String(p.id))}`);
+ detail.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function selectDetailImage(el){
+ const main=$('detailMainImage');if(main)main.src=el.dataset.url||'';
+ document.querySelectorAll('.detail-thumb').forEach(x=>x.classList.toggle('active',x===el));
+}
+function changeDetailQty(delta,max=999){
+ const el=$('detailQty');if(!el)return;
+ const current=Number(normalizeDigits(el.textContent))||1;
+ el.textContent=Math.max(1,Math.min(Number(max)||999,current+delta)).toLocaleString('fa-IR');
+}
+function addDetailToCart(id){
+ const p=products.find(x=>Number(x.id)===Number(id));if(!p)return;
+ const qty=Number(normalizeDigits($('detailQty')?.textContent||'1'))||1;
+ for(let i=0;i<qty;i++)addToCart(id);
+ $('cartModal').classList.remove('hidden');
+}
+function closeProduct(){
+ $('productDetail').classList.add('hidden');
+ $('products').classList.remove('hidden');
+ $('categories').classList.remove('hidden');
+ history.pushState({},'',location.pathname+location.search);
+ $('shop').scrollIntoView({behavior:'smooth',block:'start'});
+}
+window.addEventListener('popstate',()=>{
+ if(!$('productDetail').classList.contains('hidden')){
+  $('productDetail').classList.add('hidden');$('products').classList.remove('hidden');$('categories').classList.remove('hidden');
+ }
+});
 
 function addToCart(id){
  const p=products.find(x=>Number(x.id)===Number(id));
