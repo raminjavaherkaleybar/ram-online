@@ -25,6 +25,8 @@ a{color:inherit}
 .top{background:var(--dark);color:#f7e9d0;text-align:center;padding:9px 12px;font-size:12px}
 .header{position:sticky;top:0;z-index:5;background:#fffdf9ed;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .head{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-logo{width:58px;height:58px;object-fit:contain;border-radius:12px;background:#fff}
 .brand{font-size:20px;font-weight:800;color:#8c6938;line-height:1.6}
 .brand small{display:block;font-size:10px;letter-spacing:4px;color:#a58b65;direction:ltr;text-align:right}
 .head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -151,7 +153,10 @@ a{color:inherit}
 
 <header class="header">
  <div class="wrap head">
-  <div class="brand">فروشگاه بدلیجات رام آنلاین<small>RAMIN JAVAHER</small></div>
+  <div class="brand-wrap">
+   <img class="brand-logo" src="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/%20(1).imagesaving" alt="لوگوی رام آنلاین" onerror="this.style.display='none'">
+   <div class="brand">فروشگاه بدلیجات رام آنلاین<small>RAMIN JAVAHER</small></div>
+  </div>
   <div class="head-actions">
    <button class="btn" id="cartOpen">سبد خرید <span id="cartCount">۰</span></button>
    <button class="btn light" onclick="document.getElementById('trackingSection').scrollIntoView({behavior:'smooth'})">پیگیری سفارش</button>
@@ -160,6 +165,15 @@ a{color:inherit}
  </div>
 </header>
 
+<main class="wrap">
+ <section class="hero">
+  <div class="hero-content">
+   <span class="hero-tag">RAMIN JAVAHER | RAM ONLINE</span>
+   <h1>زیبایی در جزئیات است</h1>
+   <p>با زیورآلات و اکسسوری‌های خاص رام آنلاین، زیبایی و درخشش را به استایل خود اضافه کنید.</p>
+   <a href="#shop" class="btn" style="display:inline-block;text-decoration:none">مشاهده محصولات</a>
+  </div>
+ </section>
 
  <section class="benefits">
   <div class="benefit"><b>✦ انتخاب خاص</b><span>محصولات زیبا و متنوع</span></div>
@@ -1124,4 +1138,3 @@ init().catch(e=>{
 </script>
 </body>
 </html>
-
