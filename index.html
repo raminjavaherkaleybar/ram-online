@@ -1238,5 +1238,38 @@ init().catch(e=>{
  $('products').innerHTML='<div class="empty">خطا در راه‌اندازی فروشگاه. صفحه را دوباره بارگذاری کنید.</div>';
 });
 </script>
+<audio id="siteMusic" loop preload="none">
+  <source src="clavier-music-soft-background-piano-285589.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" type="button"
+style="position:fixed;bottom:18px;left:16px;z-index:9999;
+border:0;border-radius:30px;padding:11px 16px;
+background:#30271f;color:#f7e9d0;font-family:Tahoma;
+font-size:13px;box-shadow:0 4px 15px #0003;">
+  ♫ پخش موسیقی
+</button>
+
+<script>
+(function(){
+  const music = document.getElementById('siteMusic');
+  const button = document.getElementById('musicToggle');
+
+  button.addEventListener('click', async function(){
+    try {
+      if (music.paused) {
+        await music.play();
+        button.textContent = '♫ توقف موسیقی';
+      } else {
+        music.pause();
+        button.textContent = '♫ پخش موسیقی';
+      }
+    } catch(error) {
+      button.textContent = 'پخش موسیقی ممکن نشد';
+      console.error(error);
+    }
+  });
+})();
+</script> 
 </body>
 </html>
