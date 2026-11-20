@@ -40,7 +40,7 @@ for (const p of products) {
     "<meta property=\"og:description\" content=\"" + esc(desc.slice(0,300)) + "\">",
     "<meta property=\"og:url\" content=\"" + esc(canonical) + "\">",
     (img ? "<meta property=\"og:image\" content=\"" + esc(img) + "\">" : ""),
-    "<script type=\"application/ld+json\">" + JSON.stringify(schema).replace(/</g,"\\\\u003c") + "<\\/script>",
+    "<script type=\"application/ld+json\">" + JSON.stringify(schema).replace(/</g,"\\u003c") + "</scr" + "ipt>",
     "<link href=\"https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap\" rel=\"stylesheet\">",
     "<style>*{box-sizing:border-box}body{margin:0;background:#fbf8f1;color:#30271f;font-family:Vazirmatn,Tahoma,sans-serif;line-height:2}main{width:min(900px,92%);margin:35px auto;background:white;border:1px solid #eee5d7;border-radius:20px;padding:24px}img{display:block;width:100%;max-height:520px;object-fit:contain;background:#f7f2e9;border-radius:15px}h1{font-size:clamp(22px,5vw,32px);line-height:1.7}.desc{color:#6f6559;white-space:pre-line}a{display:inline-block;background:#a9854a;color:white;text-decoration:none;padding:10px 22px;border-radius:12px;font-weight:700}small{color:#887d70}@media(max-width:600px){main{padding:14px;margin:16px auto}}</style>",
     "</head><body><main><p><small>رام آنلاین | RAMIN JAVAHER</small></p>",
@@ -49,16 +49,16 @@ for (const p of products) {
     "<p class=\"desc\">" + esc(desc) + "</p>",
     "<a href=\"/?product=" + encodeURIComponent(id) + "\">مشاهده محصول و ثبت سفارش</a>",
     "<p><small>فروشگاه اینترنتی بدلیجات و زیورآلات رام آنلاین</small></p></main></body></html>"
-  ].join("\\n");
+  ].join("\n");
   const dir = path.join("products", id);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, "index.html"), html, "utf8");
   urls.push(canonical);
 }
 if (!urls.length) throw new Error("No valid product IDs found; sitemap was not changed.");
-const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n' +
+const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n' +
   '  <url><loc>' + root + '/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\\n' +
-  urls.map(u => '  <url><loc>' + esc(u) + '</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>').join("\\n") +
-  '\\n</urlset>\\n';
+  urls.map(u => '  <url><loc>' + esc(u) + '</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>').join("\n") +
+  '\n</urlset>\n';
 await fs.writeFile("sitemap.xml", sitemap, "utf8");
 console.log("Generated " + urls.length + " product pages and updated sitemap.xml.");
