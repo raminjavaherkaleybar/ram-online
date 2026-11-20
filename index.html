@@ -23,11 +23,6 @@
 <meta name="twitter:description" content="خرید آنلاین بدلیجات و زیورآلات زنانه از رام آنلاین.">
 <meta name="twitter:image" content="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
 
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="رام آنلاین | فروشگاه بدلیجات و زیورآلات">
-<meta name="twitter:description" content="خرید آنلاین بدلیجات و زیورآلات زنانه از رام آنلاین.">
-<meta name="twitter:image" content="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -736,10 +731,6 @@ $('saveShippingBtn').onclick=async()=>{
 
 $('checkoutForm').addEventListener('submit',async e=>{
  e.preventDefault();
- // Open a blank tab synchronously during the user's submit action.
- // This avoids mobile popup blockers after the asynchronous order RPC.
- let whatsappWindow=null;
- if(cart.length) whatsappWindow=window.open('about:blank','_blank');
  if(!cart.length){
   msg('checkoutMsg','سبد خرید خالی است.','error');
   return;
@@ -749,6 +740,9 @@ $('checkoutForm').addEventListener('submit',async e=>{
   msg('checkoutMsg','شماره موبایل باید با 09 شروع شود و 11 رقم باشد.','error');
   return;
  }
+ // Open a blank tab only after validation, synchronously during the user's submit action.
+ // This avoids mobile popup blockers after the asynchronous order RPC without leaving blank tabs on invalid input.
+ let whatsappWindow=window.open('about:blank','_blank');
  const submit=$('checkoutBtn');
  submit.disabled=true;
  $('orderSuccess').classList.add('hidden');
