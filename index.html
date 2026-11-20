@@ -815,7 +815,7 @@ ${lines}
     مبلغ نهایی: <b>${money(savedTotal)}</b><br>
     
     این شماره را برای پیگیری نگه دارید.
-    ${result.rubika_link_code ? '<hr><b>اتصال به ربات روبیکا</b><br>برای دریافت اطلاع‌رسانی سفارش، وارد <a href="https://rubika.ir/RaminJavaherBot" target="_blank" rel="noopener">ربات روبیکا رام آنلاین</a> شوید و کد زیر را برای ربات بفرستید:<br><b dir="ltr" style="font-size:18px;letter-spacing:2px">' + esc(result.rubika_link_code) + '</b><br><small>این کد فقط ۱۰ دقیقه اعتبار دارد و یک‌بار قابل استفاده است.</small>' : ''}`;
+    ${result.rubika_link_code ? '<hr><b>اتصال خودکار به ربات روبیکا</b><br>برای اتصال حساب و دریافت اطلاعات پرداخت، روی دکمه زیر بزنید:<br><a class="btn" style="display:inline-block;text-decoration:none;margin:10px 0" href="https://rubika.ir/RaminJavaherBot?start=' + encodeURIComponent(result.rubika_link_code) + '" target="_blank" rel="noopener">اتصال به ربات و دریافت اطلاعات پرداخت</a><br><details><summary class="small" style="cursor:pointer">اگر دکمه کار نکرد، کد را دستی وارد کنید</summary><b dir="ltr" style="font-size:15px;letter-spacing:1px;word-break:break-all">' + esc(result.rubika_link_code) + '</b></details><br><small>این کد فقط ۱۰ دقیقه اعتبار دارد و یک‌بار قابل استفاده است.</small>' : ''}`;
   }
   await loadProducts();
 
