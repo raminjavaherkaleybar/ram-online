@@ -381,7 +381,6 @@ a{color:inherit}
   آذربایجان شرقی، شهرستان کلیبر، خیابان معلم<br>
   موبایل: 09387893112 | تلفن: 04144446002
   <hr>
-  واتساپ: <a href="https://wa.me/989148023112" target="_blank" rel="noopener">09148023112</a><br>
   اینستاگرام: <a href="https://www.instagram.com/ramin_javaherkaleybar/" target="_blank" rel="noopener">ramin_javaherkaleybar</a><br>
   تلگرام: <a href="https://t.me/ramin_javaherkaleybar/" target="_blank" rel="noopener">ramin_javaherkaleybar</a>
   <hr>
@@ -740,9 +739,6 @@ $('checkoutForm').addEventListener('submit',async e=>{
   msg('checkoutMsg','شماره موبایل باید با 09 شروع شود و 11 رقم باشد.','error');
   return;
  }
- // Open a blank tab only after validation, synchronously during the user's submit action.
- // This avoids mobile popup blockers after the asynchronous order RPC without leaving blank tabs on invalid input.
- let whatsappWindow=window.open('about:blank','_blank');
  const submit=$('checkoutBtn');
  submit.disabled=true;
  $('orderSuccess').classList.add('hidden');
@@ -785,22 +781,6 @@ $('checkoutForm').addEventListener('submit',async e=>{
   const orderId=result.order_id??result.id??result.orderId;
   const savedShipping=Number(result.shipping_cost??defaultShippingCost);
   const savedTotal=Number(result.total_amount??(subtotal+savedShipping));
-  const lines=cart.map(x=>`${x.name} × ${x.qty} - ${money(x.price*x.qty)}`).join('\n');
-
-  const wa=`سلام، سفارش جدید در سایت رام ثبت شد.
-شماره سفارش: ${orderId??'ثبت‌شده'}
-نام: ${payload.p_full_name}
-موبایل: ${mobile}
-استان: ${payload.p_province}
-شهر: ${payload.p_city}
-آدرس: ${payload.p_address}
-محصولات:
-${lines}
-جمع محصولات: ${money(Number(result.items_total??subtotal))}
-هزینه ارسال: ${money(savedShipping)}
-مبلغ نهایی: ${money(savedTotal)}
-توضیحات مشتری: ${$('cNote').value.trim()||'ندارد'}`;
-
   cart=[];
   renderCart();
   $('checkoutForm').reset();
@@ -819,10 +799,7 @@ ${lines}
   }
   await loadProducts();
 
-  const whatsappUrl='https://wa.me/989148023112?text='+encodeURIComponent(wa);
-  if(whatsappWindow&&!whatsappWindow.closed) whatsappWindow.location.href=whatsappUrl;
  }catch(error){
-  if(whatsappWindow&&!whatsappWindow.closed) whatsappWindow.close();
   console.error(error);
   msg('checkoutMsg','ثبت سفارش انجام نشد: '+errText(error),'error');
  }finally{
@@ -1261,15 +1238,6 @@ async function updateOrderTracking(id){
 
   alert('کد رهگیری با موفقیت ذخیره شد.');
 
-  const mobile=order?.customer?.mobile;
-  if(mobile&&trackingCode){
-   const message=`سلام، سفارش شماره ${id} از فروشگاه رام ارسال شد.
-کد رهگیری پستی: ${trackingCode}
-برای پیگیری سفارش به سایت فروشگاه مراجعه کنید.`;
-   if(confirm('آیا پیام کد رهگیری را از طریق واتساپ برای مشتری باز کنیم؟')){
-    window.open('https://wa.me/98'+normalizeDigits(mobile).replace(/\D/g,'').replace(/^0/,'')+'?text='+encodeURIComponent(message),'_blank');
-   }
-  }
  }catch(error){
   console.error(error);
   alert('ذخیره کد رهگیری ناموفق بود: '+errText(error));
