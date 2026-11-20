@@ -471,6 +471,7 @@ async function init(){
  await loadProducts();
  await loadShippingSettings();
  renderCart();
+ syncProductRoute();
  const {data:{session}}=await db.auth.getSession();
  if(session)await verifyAdmin(false);
 }
@@ -531,7 +532,56 @@ function productGallery(p){
  const urls=[p.image_url,...extra].map(x=>typeof x==='string'?x:(x?.url||x?.image_url||'')).filter(Boolean);
  return [...new Set(urls)];
 }
-function openProduct(id){
+const HOME_SEO={title:document.title,description:document.querySelector('meta[name="description"]')?.content||'فروشگاه رام آنلاین؛ خرید اینترنتی بدلیجات و زیورآلات زنانه.',canonical:'https://raminjavaher.ir/'};
+function setMeta(selector,attribute,value){
+ let el=document.querySelector(selector);
+ if(!el){
+  el=document.createElement('meta');
+  const m=selector.match(/\[(name|property)="([^"]+)"\]/);
+  if(m)el.setAttribute(m[1],m[2]);
+  document.head.appendChild(el);
+ }
+ el.setAttribute(attribute,value);
+}
+function setProductSEO(p){
+ const description=String(p.description||p.details||p.short_description||('خرید '+p.name+' از فروشگاه رام آنلاین. مشاهده تصاویر، قیمت و ثبت سفارش آنلاین.')).replace(/\s+/g,' ').trim().slice(0,300);
+ const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(p.id));
+ const images=productGallery(p),image=images[0]||'';
+ document.title=p.name+' | خرید از رام آنلاین';
+ setMeta('meta[name="description"]','content',description);
+ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=url;
+ setMeta('meta[property="og:type"]','content','product');
+ setMeta('meta[property="og:title"]','content',document.title);
+ setMeta('meta[property="og:description"]','content',description);
+ setMeta('meta[property="og:url"]','content',url);
+ setMeta('meta[property="og:image"]','content',image);
+ setMeta('meta[name="twitter:title"]','content',document.title);
+ setMeta('meta[name="twitter:description"]','content',description);
+ setMeta('meta[name="twitter:image"]','content',image);
+ let schema=document.getElementById('productSeoSchema');
+ if(!schema){schema=document.createElement('script');schema.id='productSeoSchema';schema.type='application/ld+json';document.head.appendChild(schema)}
+ schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:String(p.name||''),description,image:images,url});
+}
+function resetHomeSEO(){
+ document.title=HOME_SEO.title;
+ setMeta('meta[name="description"]','content',HOME_SEO.description);
+ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=HOME_SEO.canonical;
+ setMeta('meta[property="og:type"]','content','website');
+ setMeta('meta[property="og:title"]','content','خرید بدلیجات و زیورآلات زنانه | رام آنلاین');
+ setMeta('meta[property="og:description"]','content','خرید اینترنتی انواع بدلیجات و زیورآلات زنانه از فروشگاه رام آنلاین.');
+ setMeta('meta[property="og:url"]','content',HOME_SEO.canonical);
+ setMeta('meta[name="twitter:title"]','content','رام آنلاین | فروشگاه بدلیجات و زیورآلات');
+ setMeta('meta[name="twitter:description"]','content','خرید آنلاین بدلیجات و زیورآلات زنانه از رام آنلاین.');
+ document.getElementById('productSeoSchema')?.remove();
+}
+function syncProductRoute(){
+ const id=new URLSearchParams(location.search).get('product');
+ if(id!==null){if(products.some(p=>String(p.id)===String(id)))openProduct(id,false);}
+ else{
+  $('productDetail').classList.add('hidden');$('products').classList.remove('hidden');$('categories').classList.remove('hidden');resetHomeSEO();
+ }
+}
+function openProduct(id,updateHistory=true){
  const p=products.find(x=>String(x.id)===String(id));
  if(!p)return;
  const stock=Number(p.stock||0),images=productGallery(p);
@@ -558,7 +608,8 @@ function openProduct(id){
  $('products').classList.add('hidden');
  $('categories').classList.add('hidden');
  detail.classList.remove('hidden');
- history.pushState({productId:String(p.id)},'',`#product-${encodeURIComponent(String(p.id))}`);
+ setProductSEO(p);
+ if(updateHistory){const url=new URL(location.href);url.searchParams.set('product',String(p.id));history.pushState({productId:String(p.id)},'',url.pathname+url.search)}
  detail.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function selectDetailImage(el){
@@ -577,17 +628,11 @@ function addDetailToCart(id){
  $('cartModal').classList.remove('hidden');
 }
 function closeProduct(){
- $('productDetail').classList.add('hidden');
- $('products').classList.remove('hidden');
- $('categories').classList.remove('hidden');
- history.pushState({},'',location.pathname+location.search);
- $('shop').scrollIntoView({behavior:'smooth',block:'start'});
+ $('productDetail').classList.add('hidden');$('products').classList.remove('hidden');$('categories').classList.remove('hidden');
+ const url=new URL(location.href);url.searchParams.delete('product');history.pushState({},'',url.pathname+url.search);
+ resetHomeSEO();$('shop').scrollIntoView({behavior:'smooth',block:'start'});
 }
-window.addEventListener('popstate',()=>{
- if(!$('productDetail').classList.contains('hidden')){
-  $('productDetail').classList.add('hidden');$('products').classList.remove('hidden');$('categories').classList.remove('hidden');
- }
-});
+window.addEventListener('popstate',syncProductRoute);
 
 function addToCart(id){
  const p=products.find(x=>Number(x.id)===Number(id));
