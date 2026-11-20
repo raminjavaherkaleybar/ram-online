@@ -736,6 +736,10 @@ $('saveShippingBtn').onclick=async()=>{
 
 $('checkoutForm').addEventListener('submit',async e=>{
  e.preventDefault();
+ // Open a blank tab synchronously during the user's submit action.
+ // This avoids mobile popup blockers after the asynchronous order RPC.
+ let whatsappWindow=null;
+ if(cart.length) whatsappWindow=window.open('about:blank','_blank');
  if(!cart.length){
   msg('checkoutMsg','سبد خرید خالی است.','error');
   return;
@@ -822,8 +826,9 @@ ${lines}
   await loadProducts();
 
   const whatsappUrl='https://wa.me/989148023112?text='+encodeURIComponent(wa);
-  window.open(whatsappUrl,'_blank');
+  if(whatsappWindow&&!whatsappWindow.closed) whatsappWindow.location.href=whatsappUrl;
  }catch(error){
+  if(whatsappWindow&&!whatsappWindow.closed) whatsappWindow.close();
   console.error(error);
   msg('checkoutMsg','ثبت سفارش انجام نشد: '+errText(error),'error');
  }finally{
