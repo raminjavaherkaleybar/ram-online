@@ -27,7 +27,15 @@ for (const p of products) {
   const desc = clean(p.description || p.details || p.short_description || ("خرید " + name + " از فروشگاه رام آنلاین؛ مشاهده تصاویر و ثبت سفارش اینترنتی."));
   const img = clean(p.image_url);
   const canonical = root + "/products/" + encodeURIComponent(id) + "/";
-  const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{})};
+  const salePriceToman = Number(p.sale_price);
+  const discountPriceToman = Number(p.discount_price);
+  const currentPriceToman = Number.isFinite(discountPriceToman) && discountPriceToman > 0
+    ? discountPriceToman
+    : salePriceToman;
+  const offer = Number.isFinite(currentPriceToman) && currentPriceToman > 0
+    ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical}
+    : null;
+  const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
   const html = [
     "<!doctype html><html lang=\"fa\" dir=\"rtl\"><head><meta charset=\"utf-8\">",
     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
