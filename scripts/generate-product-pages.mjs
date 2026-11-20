@@ -33,7 +33,7 @@ for (const p of products) {
     ? discountPriceToman
     : salePriceToman;
   const offer = Number.isFinite(currentPriceToman) && currentPriceToman > 0
-    ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":Number(p.stock||0)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted"}}
+    ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":"https://schema.org/OutOfStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted"}}
     : null;
   const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
   const html = [
