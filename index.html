@@ -169,6 +169,10 @@ a{color:inherit}
 .detail-thumb.active{border-color:var(--gold)}
 .detail-info{padding:8px 2px;min-width:0}
 .detail-info h2{font-size:22px;line-height:1.8;margin:12px 0}
+.detail-code{font-size:12px;color:var(--muted);margin-top:10px}
+.detail-code b{color:#6f5430}
+.detail-actions .btn{min-height:44px}
+@media(max-width:600px){.detail-actions{display:grid;grid-template-columns:1fr 1fr}.detail-actions .btn{width:100%;font-size:12px;padding:10px 7px}.detail-actions .detail-qty{grid-column:1/-1;justify-content:center}.detail-main-image{height:290px}}
 .detail-description{font-size:14px;line-height:2.2;color:#6f6559;white-space:pre-line}
 .detail-price{font-size:21px;font-weight:800;color:#97713e;margin:16px 0}
 .detail-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:18px}
@@ -583,7 +587,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/?product=${Number(p.id)}" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/${Number(p.id)}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
@@ -634,7 +638,7 @@ function setProductSEO(p){
  setMeta('meta[name="twitter:image"]','content',image);
  let schema=document.getElementById('productSeoSchema');
  if(!schema){schema=document.createElement('script');schema.id='productSeoSchema';schema.type='application/ld+json';document.head.appendChild(schema)}
- schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:String(p.name||''),description,image:images,url});
+ schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Product',name:String(p.name||''),description,sku:String(p.code||p.id),image:images,url,offers:{'@type':'Offer',price:String(Math.round(productPrice(p)*10)),priceCurrency:'IRR',availability:Number(p.stock||0)>0?'https://schema.org/InStock':'https://schema.org/OutOfStock',url}});
 }
 function resetHomeSEO(){
  document.title=HOME_SEO.title;
@@ -669,13 +673,15 @@ function openProduct(id,updateHistory=true){
    </div>
    <div class="detail-info">
     <span class="badge">${esc(categoryName(p))}</span>
-    <h2>${esc(p.name)}</h2>
+    <div class="detail-code">کد محصول: <b>${esc(p.code||'ثبت نشده')}</b></div>
+   <h2>${esc(p.name)}</h2>
     <div class="detail-price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
     <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد`:'در حال حاضر ناموجود'}</div>
     <div class="detail-description">${esc(description)}</div>
     <div class="detail-actions">
      <div class="detail-qty"><button type="button" onclick="changeDetailQty(-1)">−</button><b id="detailQty">۱</b><button type="button" onclick="changeDetailQty(1,${stock})">+</button></div>
      <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart(${Number(p.id)})">افزودن به سبد خرید</button>
+      <button class="btn light" type="button" onclick="shareProduct(${Number(p.id)})">اشتراک‌گذاری محصول</button>
     </div>
    </div>
   </div>`;
@@ -701,6 +707,20 @@ function addDetailToCart(id){
  for(let i=0;i<qty;i++)addToCart(id);
  $('cartModal').classList.remove('hidden');
 }
+async function shareProduct(id){
+ const p=products.find(x=>String(x.id)===String(id));
+ const url='https://raminjavaher.ir/products/'+encodeURIComponent(String(id))+'/';
+ const shareData={title:(p?.name||'محصول')+' | رام آنلاین',text:'مشاهده مشخصات و ثبت سفارش در رام آنلاین',url};
+ try{
+  if(navigator.share){await navigator.share(shareData);return;}
+  if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);alert('لینک محصول کپی شد؛ می‌توانید آن را برای مشتری ارسال کنید.');return;}
+  window.prompt('لینک محصول را کپی کنید:',url);
+ }catch(error){
+  if(error?.name==='AbortError')return;
+  try{window.prompt('لینک محصول را کپی کنید:',url);}catch(_){alert('اشتراک‌گذاری در این مرورگر پشتیبانی نمی‌شود.');}
+ }
+}
+
 function closeProduct(){
  $('productDetail').classList.add('hidden');$('products').classList.remove('hidden');$('categories').classList.remove('hidden');
  const url=new URL(location.href);url.searchParams.delete('product');history.pushState({},'',url.pathname+url.search);
