@@ -623,7 +623,7 @@ function setProductSEO(p){
  let description=String(p.description||p.details||p.short_description||'').replace(/\s+/g,' ').trim();
  if(description.length<70)description=(description+' خرید '+String(p.name||'این محصول')+' از فروشگاه رام آنلاین؛ مشاهده تصاویر، قیمت و ثبت سفارش اینترنتی.').trim();
  description=description.slice(0,160);
- const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(p.id));
+ const url='https://raminjavaher.ir/products/'+encodeURIComponent(String(p.id))+'/';
  const images=productGallery(p),image=images[0]||'';
  document.title=p.name+' | خرید از رام آنلاین';
  setMeta('meta[name="description"]','content',description);
