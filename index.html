@@ -7,7 +7,7 @@
 
 <title>فروشگاه بدلیجات رام آنلاین | خرید زیورآلات زنانه</title>
 <meta name="description" content="فروشگاه بدلیجات رام آنلاین؛ خرید آنلاین انواع گوشواره، انگشتر، دستبند و گردنبند زنانه. مشاهده مدل‌ها و ثبت سفارش اینترنتی.">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="index, follow, max-image-preview:large">\n<meta name="theme-color" content="#fbf8f1">\n<link rel="preconnect" href="https://pbexlgscthtasixhtljd.supabase.co">\n<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://raminjavaher.ir/">
 
 <meta property="og:type" content="website">
@@ -579,7 +579,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/products/${Number(p.id)}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/?product=${Number(p.id)}" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
@@ -615,7 +615,7 @@ function setProductSEO(p){
  let description=String(p.description||p.details||p.short_description||'').replace(/\s+/g,' ').trim();
  if(description.length<70)description=(description+' خرید '+String(p.name||'این محصول')+' از فروشگاه رام آنلاین؛ مشاهده تصاویر، قیمت و ثبت سفارش اینترنتی.').trim();
  description=description.slice(0,160);
- const url='https://raminjavaher.ir/products/'+encodeURIComponent(String(p.id))+'/';
+ const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(p.id));
  const images=productGallery(p),image=images[0]||'';
  document.title=p.name+' | خرید از رام آنلاین';
  setMeta('meta[name="description"]','content',description);
