@@ -71,7 +71,7 @@ a{color:inherit}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
 .product{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:.25s}
 .product:hover{transform:translateY(-4px);box-shadow:0 12px 30px #46351c12}
-.product-image{height:220px;background:#f3ede3;overflow:hidden}
+.product-image{display:block;text-decoration:none;height:220px;background:#f3ede3;overflow:hidden}
 .product-image img{width:100%;height:100%;object-fit:cover;display:block;transition:.4s}
 .product:hover img{transform:scale(1.045)}
 .product-body{padding:14px}
@@ -507,7 +507,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <div class="product-image" role="button" tabindex="0" onclick="openProduct(${Number(p.id)})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProduct(${Number(p.id)})}"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" onerror="this.style.display='none'"></div>
+   <a class="product-image" href="/?product=${Number(p.id)}" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
