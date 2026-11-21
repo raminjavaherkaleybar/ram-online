@@ -13,6 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://raminjavaher.ir/">
+<link rel="preload" as="image" href="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fa_IR">
@@ -41,6 +42,7 @@ body{margin:0;background:var(--cream);color:var(--dark);font-family:Vazirmatn,Ta
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;transition:.2s}
 button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #b18a50;outline-offset:3px}
 a{color:inherit}
 .wrap{width:min(1160px,92%);margin:auto}
 .top{background:var(--dark);color:#f7e9d0;text-align:center;padding:9px 12px;font-size:12px}
@@ -240,6 +242,7 @@ a{color:inherit}
 .store-intro h2{font-size:18px!important}
 .store-intro p{font-size:14px}
 @media(max-width:600px){.store-intro h2{font-size:16px!important}.store-intro p{font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 
 <script type="application/ld+json">
@@ -587,7 +590,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/products/${Number(p.id)}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/${Number(p.id)}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
