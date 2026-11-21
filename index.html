@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>خرید بدلیجات و زیورآلات زنانه | رام آنلاین RAMIN JAVAHER</title>
-<meta name="description" content="فروشگاه رام آنلاین؛ خرید اینترنتی بدلیجات و زیورآلات زنانه شامل انگشتر، دستبند، گردنبند، گوشواره، پابند و نیم‌ست. مشاهده مدل‌های متنوع بدلیجات رامین و ثبت سفارش آنلاین.">
+<meta name="description" content="خرید آنلاین بدلیجات و زیورآلات زنانه از رام آنلاین؛ انواع انگشتر، دستبند، گردنبند و گوشواره با امکان مشاهده مدل‌ها و ثبت سفارش اینترنتی.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://raminjavaher.ir/">
 
@@ -538,7 +538,9 @@ function setMeta(selector,attribute,value){
  el.setAttribute(attribute,value);
 }
 function setProductSEO(p){
- const description=String(p.description||p.details||p.short_description||('خرید '+p.name+' از فروشگاه رام آنلاین. مشاهده تصاویر، قیمت و ثبت سفارش آنلاین.')).replace(/\s+/g,' ').trim().slice(0,300);
+ let description=String(p.description||p.details||p.short_description||'').replace(/\s+/g,' ').trim();
+ if(description.length<70)description=(description+' خرید '+String(p.name||'این محصول')+' از فروشگاه رام آنلاین؛ مشاهده تصاویر، قیمت و ثبت سفارش اینترنتی.').trim();
+ description=description.slice(0,160);
  const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(p.id));
  const images=productGallery(p),image=images[0]||'';
  document.title=p.name+' | خرید از رام آنلاین';
