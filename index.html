@@ -414,7 +414,7 @@ a{color:inherit}
    <label class="field">شهر<input id="cCity" autocomplete="address-level2" maxlength="60" required></label>
    <label class="field">آدرس کامل<textarea id="cAddress" autocomplete="street-address" maxlength="700" required></textarea></label>
    <label class="field">کد پستی<input id="cPostal" inputmode="numeric" autocomplete="postal-code" maxlength="10"></label>
-   <label class="field">توضیحات سفارش<textarea id="cNote"></textarea></label>
+   <label class="field">توضیحات سفارش<textarea id="cNote" maxlength="1000" placeholder="مثلاً رنگ یا توضیح خاص سفارش (اختیاری)"></textarea></label>
    <button class="btn" type="submit" id="checkoutBtn">ثبت نهایی سفارش</button>
    <div id="checkoutMsg"></div>
    <div id="orderSuccess" class="notice ok hidden"></div>
@@ -826,6 +826,7 @@ $('checkoutForm').addEventListener('submit',async e=>{
    p_city:$('cCity').value.trim(),
    p_address:$('cAddress').value.trim(),
    p_postal_code:$('cPostal').value.trim(),
+   p_note:$('cNote').value.trim(),
    p_items:cart.map(x=>({id:x.id,quantity:x.qty}))
   };
 
