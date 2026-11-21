@@ -127,6 +127,35 @@ a{color:inherit}
 .order-table th,.order-table td{padding:9px;border-bottom:1px solid #e6ddcf;vertical-align:middle;font-size:12px}
 .shipping-box{background:#f5efe5;padding:12px;border-radius:12px;margin-top:12px}
 .shipping-box .field{max-width:220px}
+.admin-tools{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:9px;margin:12px 0}
+.admin-tools input,.admin-tools select{width:100%;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff;color:var(--dark)}
+.admin-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}
+.admin-stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}
+.admin-stat b{display:block;font-size:19px;color:var(--dark)}
+.admin-stat span{font-size:11px;color:var(--muted)}
+.stock-alert{background:#fff0e8;color:#a34220;border:1px solid #f2c7b4}
+.stock-ok{background:#e9f5ec;color:#28643a}
+.order-card .order-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.order-card .order-meta{line-height:2.1;margin:7px 0}
+.details p{overflow-wrap:anywhere}
+@media(max-width:600px){
+ .admin-tools{grid-template-columns:1fr}
+ .admin-summary{gap:6px}
+ .admin-stat{padding:9px 5px}
+ .admin-stat b{font-size:16px}
+ .admin-stat span{font-size:10px}
+ .admin-product.row{align-items:flex-start;flex-wrap:wrap}
+ .admin-product .grow{flex:1 1 calc(100% - 80px)}
+ .admin-product .btn{flex:1 1 auto;font-size:11px;padding:9px 8px}
+ .order-card{padding:11px}
+ .order-card .shipping-box .row{align-items:stretch}
+ .order-card .shipping-box .field,.order-card .tracking-row .field{flex:1 1 100%;max-width:none}
+ .order-actions{display:grid;grid-template-columns:1fr}
+ .order-actions select,.order-actions .btn{width:100%;min-height:42px}
+ .tracking-row{display:grid;grid-template-columns:1fr}
+ .tracking-row .btn{width:100%}
+ .order-table{min-width:440px}
+}
 
 .product-detail{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin:18px 0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:22px}
 .detail-gallery{min-width:0}
@@ -349,12 +378,24 @@ a{color:inherit}
     <div id="productMsg"></div>
    </form>
    <h3>فهرست محصولات</h3>
-   <div id="adminProducts"></div>
+   <div id="adminStockSummary" class="admin-summary"></div>
+    <div class="admin-tools">
+     <input id="adminProductSearch" type="search" placeholder="جست‌وجوی نام یا کد محصول">
+     <select id="adminStockFilter"><option value="all">همه محصولات</option><option value="low">موجودی کم (۳ یا کمتر)</option><option value="out">ناموجود</option></select>
+    </div>
+    <div id="adminProducts"></div>
   </div>
 
   <div id="ordersTab" class="hidden">
    <h3>مدیریت سفارش‌ها</h3>
-   <button class="btn" id="refreshOrders">به‌روزرسانی سفارش‌ها</button>
+   <div class="admin-summary" id="orderSummary"></div>
+   <div class="admin-tools">
+    <input id="orderSearch" type="search" placeholder="جست‌وجو با نام، موبایل یا شماره سفارش">
+    <select id="orderStatusFilter">
+     <option value="all">همه وضعیت‌ها</option><option value="pending">در انتظار بررسی</option><option value="confirmed">تأیید شده</option><option value="processing">در حال آماده‌سازی</option><option value="shipped">ارسال شده</option><option value="delivered">تحویل شده</option><option value="cancelled">لغو شده</option>
+    </select>
+   </div>
+   <button class="btn light" id="refreshOrders">به‌روزرسانی سفارش‌ها</button>
    <div id="adminOrders"></div>
   </div>
 
@@ -1046,21 +1087,43 @@ async function loadAdminProducts(){
   const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false});
   if(error)throw error;
   adminProducts=data||[];
-
-  $('adminProducts').innerHTML=adminProducts.length?adminProducts.map(p=>`
-   <div class="admin-product row">
-    <img src="${esc(p.image_url||'')}" onerror="this.style.display='none'">
-    <div class="grow"><b>${esc(p.name)}</b>
-     <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${Number(p.stock)}</div>
-     <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span>
-    </div>
-    <button class="btn light" onclick="openEdit(${Number(p.id)})">ویرایش</button>
-    <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${Number(p.id)},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
-    <button class="btn red" onclick="deleteProduct(${Number(p.id)})">حذف</button>
-   </div>`).join(''):'<div class="empty">هنوز محصولی ثبت نشده است.</div>';
+  renderAdminProducts();
  }catch(error){
   $('adminProducts').innerHTML='<div class="notice error">'+esc(errText(error))+'</div>';
  }
+}
+
+function renderAdminProducts(){
+ const box=$('adminProducts');
+ const query=normalizeDigits(($('adminProductSearch')?.value||'').trim().toLowerCase());
+ const filter=$('adminStockFilter')?.value||'all';
+ const low=adminProducts.filter(p=>Number(p.stock||0)>0&&Number(p.stock||0)<=3);
+ const out=adminProducts.filter(p=>Number(p.stock||0)<=0);
+ $('adminStockSummary').innerHTML=`
+  <div class="admin-stat"><b>${adminProducts.length.toLocaleString('fa-IR')}</b><span>کل محصولات</span></div>
+  <div class="admin-stat stock-alert"><b>${low.length.toLocaleString('fa-IR')}</b><span>موجودی کم (۳ یا کمتر)</span></div>
+  <div class="admin-stat stock-alert"><b>${out.length.toLocaleString('fa-IR')}</b><span>ناموجود</span></div>`;
+ const filtered=adminProducts.filter(p=>{
+  const searchable=normalizeDigits([p.name,p.code,categoryName(p)].join(' ').toLowerCase());
+  const stock=Number(p.stock||0);
+  return (!query||searchable.includes(query))&&(filter==='all'||(filter==='low'&&stock>0&&stock<=3)||(filter==='out'&&stock<=0));
+ });
+ if(!filtered.length){box.innerHTML='<div class="empty">محصولی با این جست‌وجو یا فیلتر پیدا نشد.</div>';return}
+ box.innerHTML=filtered.map(p=>{
+  const stock=Number(p.stock||0);
+  const stockClass=stock<=3?'stock-alert':'stock-ok';
+  const stockLabel=stock<=0?'ناموجود':stock<=3?'نیازمند تأمین موجودی':'موجودی کافی';
+  return `<div class="admin-product row">
+   <img src="${esc(p.image_url||'')}" onerror="this.style.display='none'">
+   <div class="grow"><b>${esc(p.name)}</b>
+    <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${stock.toLocaleString('fa-IR')}</div>
+    <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span> <span class="badge ${stockClass}">${stockLabel}</span>
+   </div>
+   <button class="btn light" onclick="openEdit(${Number(p.id)})">ویرایش / موجودی</button>
+   <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${Number(p.id)},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
+   <button class="btn red" onclick="deleteProduct(${Number(p.id)})">حذف</button>
+  </div>`;
+ }).join('');
 }
 
 function openEdit(id){
@@ -1153,34 +1216,40 @@ async function loadAdminOrders(){
 
 function renderAdminOrders(){
  const box=$('adminOrders');
- if(!adminOrders.length){
-  box.innerHTML='<div class="empty">هنوز سفارشی ثبت نشده است.</div>';
-  return;
- }
- box.innerHTML=adminOrders.map(o=>{
+ const search=normalizeDigits(($('orderSearch')?.value||'').trim().toLowerCase());
+ const status=$('orderStatusFilter')?.value||'all';
+ const pendingCount=adminOrders.filter(o=>o.status==='pending').length;
+ const activeCount=adminOrders.filter(o=>!['delivered','cancelled'].includes(o.status)).length;
+ $('orderSummary').innerHTML=`
+  <div class="admin-stat"><b>${adminOrders.length.toLocaleString('fa-IR')}</b><span>کل سفارش‌ها</span></div>
+  <div class="admin-stat"><b>${pendingCount.toLocaleString('fa-IR')}</b><span>در انتظار بررسی</span></div>
+  <div class="admin-stat"><b>${activeCount.toLocaleString('fa-IR')}</b><span>در حال پیگیری</span></div>`;
+ if(!adminOrders.length){box.innerHTML='<div class="empty">هنوز سفارشی ثبت نشده است.</div>';return}
+ const filtered=adminOrders.filter(o=>{
   const c=o.customer||{};
-  const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR'):'—';
+  const searchable=normalizeDigits([o.id,c.full_name,c.mobile].join(' ').toLowerCase());
+  return (!search||searchable.includes(search))&&(status==='all'||o.status===status);
+ });
+ if(!filtered.length){box.innerHTML='<div class="empty">سفارشی با این جست‌وجو یا فیلتر پیدا نشد.</div>';return}
+ box.innerHTML=filtered.map(o=>{
+  const c=o.customer||{};
+  const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR',{dateStyle:'short',timeStyle:'short'}):'—';
   const subtotal=getOrderSubtotal(o);
-
   return `<article class="order-card" id="order-card-${esc(o.id)}">
-   <div class="row" style="justify-content:space-between">
-    <b>سفارش شماره ${esc(o.id)}</b>
-    <span class="badge">${esc(statusLabel(o.status))}</span>
+   <div class="order-top"><b>سفارش شماره ${esc(o.id)}</b><span class="badge">${esc(statusLabel(o.status))}</span></div>
+   <div class="order-meta small">
+    <div>مشتری: <b>${esc(c.full_name||'نامشخص')}</b> | موبایل: <b>${esc(c.mobile||'—')}</b></div>
+    <div>تاریخ ثبت: ${esc(date)}</div>
    </div>
-   <div class="small">تاریخ: ${esc(date)} | مشتری: ${esc(c.full_name||'نامشخص')}</div>
    <div class="small">جمع محصولات: ${money(subtotal)} | هزینه ارسال: ${money(o.shipping_cost)} | مبلغ کل: <b>${money(o.total_amount)}</b></div>
-
    <div class="shipping-box">
     <b>تغییر هزینه ارسال همین سفارش</b>
     <div class="row">
-     <label class="field">هزینه ارسال (تومان)
-      <input id="order-shipping-${esc(o.id)}" type="number" min="0" step="1000" value="${Number(o.shipping_cost||0)}">
-     </label>
+     <label class="field">هزینه ارسال (تومان)<input id="order-shipping-${esc(o.id)}" type="number" min="0" step="1000" value="${Number(o.shipping_cost||0)}"></label>
      <button class="btn green" data-action="shipping" data-id="${esc(o.id)}">ذخیره هزینه و مبلغ کل</button>
     </div>
     <div class="small">جمع محصولات این سفارش: ${money(subtotal)}</div>
    </div>
-
    <div class="order-actions">
     <button class="btn" data-action="details" data-id="${esc(o.id)}">مشاهده جزئیات</button>
     <select id="status-${esc(o.id)}">
@@ -1188,11 +1257,8 @@ function renderAdminOrders(){
     </select>
     <button class="btn green" data-action="status" data-id="${esc(o.id)}">ذخیره وضعیت</button>
    </div>
-
    <div class="tracking-row">
-    <label class="field">کد رهگیری پستی
-     <input id="tracking-${esc(o.id)}" value="${esc(o.tracking_code||'')}" placeholder="کد رهگیری را وارد کنید">
-    </label>
+    <label class="field">کد رهگیری پستی<input id="tracking-${esc(o.id)}" value="${esc(o.tracking_code||'')}" placeholder="کد رهگیری را وارد کنید"></label>
     <button class="btn" data-action="tracking" data-id="${esc(o.id)}">ذخیره کد رهگیری</button>
    </div>
    <div class="details hidden" id="details-${esc(o.id)}"></div>
@@ -1218,10 +1284,13 @@ function showOrderDetails(id){
 
  const subtotal=getOrderSubtotal(o);
  area.innerHTML=`<h4>جزئیات سفارش ${esc(o.id)}</h4>
-  <p><b>نام مشتری:</b> ${esc(c.full_name||'—')} | <b>موبایل:</b> ${esc(c.mobile||'—')}</p>
+  <p><b>تاریخ و ساعت ثبت:</b> ${esc(o.created_at?new Date(o.created_at).toLocaleString('fa-IR',{dateStyle:'full',timeStyle:'short'}):'—')}</p>
+  <p><b>نام مشتری:</b> ${esc(c.full_name||'—')}</p>
+  <p><b>موبایل:</b> <a href="tel:${esc(c.mobile||'')}">${esc(c.mobile||'—')}</a></p>
   <p><b>استان و شهر:</b> ${esc(c.province||'—')}، ${esc(c.city||'—')}</p>
   <p><b>آدرس:</b> ${esc(c.address||'—')}</p>
   <p><b>کد پستی:</b> ${esc(c.postal_code||'—')}</p>
+  <p><b>روش پرداخت:</b> پرداخت هنگام هماهنگی با مشتری</p>
   <div style="overflow:auto">
    <table class="order-table">
     <thead><tr><th>عکس</th><th>محصول</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th></tr></thead>
@@ -1366,6 +1435,10 @@ $('adminOrders').addEventListener('click',e=>{
 });
 
 $('refreshOrders').onclick=loadAdminOrders;
+$('orderSearch').addEventListener('input',renderAdminOrders);
+$('orderStatusFilter').addEventListener('change',renderAdminOrders);
+$('adminProductSearch').addEventListener('input',renderAdminProducts);
+$('adminStockFilter').addEventListener('change',renderAdminProducts);
 
 init().catch(e=>{
  console.error(e);
