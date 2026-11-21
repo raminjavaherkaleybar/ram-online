@@ -142,6 +142,12 @@ a{color:inherit}
 .detail-qty{display:flex;align-items:center;gap:12px;background:var(--soft);padding:7px 12px;border-radius:12px}
 .detail-qty button{border:0;background:white;border-radius:8px;width:32px;height:32px;font-size:18px}
 .detail-back{margin-bottom:12px}
+.catalog-tools{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:10px;margin:12px 0 8px}
+.catalog-tools input,.catalog-tools select{width:100%;min-width:0;min-height:46px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 13px;color:var(--dark);outline:none}
+.catalog-tools input:focus,.catalog-tools select:focus{border-color:var(--gold);box-shadow:0 0 0 3px #b18a5018}
+.catalog-count{font-size:12px;color:var(--muted);margin:0 0 13px}
+@media(max-width:600px){.catalog-tools{grid-template-columns:minmax(0,1fr) 135px;gap:7px}.catalog-tools input,.catalog-tools select{font-size:12px;min-height:43px;padding:9px}}
+@media(max-width:360px){.catalog-tools{grid-template-columns:1fr}.catalog-tools select{width:100%}}
 @media(max-width:700px){.product-detail{grid-template-columns:1fr;padding:12px;gap:10px}.detail-main-image{height:310px}.detail-info h2{font-size:18px}.detail-price{font-size:18px}}
 @media(max-width:850px){
  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -280,6 +286,13 @@ a{color:inherit}
   <div class="section-head" style="margin-top:14px">
    <div><h2 class="section-title">محصولات فروشگاه</h2><p class="section-sub">زیبایی را به استایل خود اضافه کنید</p></div>
   </div>
+  <div class="catalog-tools" role="search" aria-label="جستجو و مرتب‌سازی محصولات">
+   <input id="productSearch" type="search" placeholder="جستجو در نام و توضیحات محصولات..." autocomplete="off" aria-label="جستجوی محصولات">
+   <select id="productSort" aria-label="مرتب‌سازی محصولات">
+    <option value="newest">جدیدترین</option><option value="price-asc">ارزان‌ترین</option><option value="price-desc">گران‌ترین</option><option value="name-asc">نام محصول</option><option value="stock">موجودی بیشتر</option>
+   </select>
+  </div>
+  <p id="productCount" class="catalog-count" aria-live="polite">در حال بارگذاری محصولات...</p>
   <div id="products" class="grid"><div class="empty">در حال دریافت محصولات...</div></div>
   <section id="productDetail" class="hidden" aria-live="polite"></section>
  </section>
@@ -431,6 +444,7 @@ const $=id=>document.getElementById(id);
 
 let categories=[],products=[],adminProducts=[],cart=[],adminOrders=[];
 let currentFilter='all',isAdmin=false;
+let productSearch='',productSort='newest';
 let defaultShippingCost=170000;
 
 const money=n=>Number(n||0).toLocaleString('fa-IR')+' تومان';
@@ -502,8 +516,24 @@ async function loadProducts(){
  renderProducts();
 }
 
+function normalizeSearchText(value){
+ return String(value||'').toLocaleLowerCase('fa-IR').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u064B-\u065F\u0670]/g,'').replace(/\s+/g,' ').trim();
+}
 function renderProducts(){
- const list=currentFilter==='all'?products:products.filter(p=>String(p.category_id)===String(currentFilter));
+ const term=normalizeSearchText(productSearch);
+ const list=products.filter(p=>{
+  const categoryMatches=currentFilter==='all'||String(p.category_id)===String(currentFilter);
+  const searchable=normalizeSearchText([p.name,p.description,p.code,categoryName(p)].join(' '));
+  return categoryMatches&&(!term||searchable.includes(term));
+ });
+ list.sort((a,b)=>{
+  if(productSort==='price-asc')return productPrice(a)-productPrice(b);
+  if(productSort==='price-desc')return productPrice(b)-productPrice(a);
+  if(productSort==='name-asc')return String(a.name||'').localeCompare(String(b.name||''),'fa');
+  if(productSort==='stock')return Number(b.stock||0)-Number(a.stock||0);
+  return new Date(b.created_at||0)-new Date(a.created_at||0);
+ });
+ $('productCount').textContent=list.length.toLocaleString('fa-IR')+' محصول از '+products.length.toLocaleString('fa-IR')+' محصول';
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
@@ -516,8 +546,10 @@ function renderProducts(){
     <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${Number(p.id)})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
    </div>
   </article>`;
- }).join(''):'<div class="empty">در این دسته محصولی ثبت نشده است.</div>';
+ }).join(''):'<div class="empty">محصولی با این مشخصات پیدا نشد. عبارت جستجو یا دسته‌بندی را تغییر دهید.</div>';
 }
+$('productSearch').addEventListener('input',e=>{productSearch=e.target.value;renderProducts();});
+$('productSort').addEventListener('change',e=>{productSort=e.target.value;renderProducts();});
 
 function productGallery(p){
  const raw=p.images||p.gallery||p.image_urls||[];
