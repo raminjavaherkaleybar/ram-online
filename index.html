@@ -408,12 +408,12 @@ a{color:inherit}
   <div class="cart-total" id="cartTotal"></div>
   <h3>اطلاعات ارسال سفارش</h3>
   <form id="checkoutForm">
-   <label class="field">نام و نام خانوادگی<input id="cName" required></label>
-   <label class="field">شماره موبایل<input id="cMobile" inputmode="tel" required placeholder="09xxxxxxxxx"></label>
-   <label class="field">استان<input id="cProvince" required></label>
-   <label class="field">شهر<input id="cCity" required></label>
-   <label class="field">آدرس کامل<textarea id="cAddress" required></textarea></label>
-   <label class="field">کد پستی<input id="cPostal"></label>
+   <label class="field">نام و نام خانوادگی<input id="cName" autocomplete="name" maxlength="100" required></label>
+   <label class="field">شماره موبایل<input id="cMobile" type="tel" inputmode="numeric" autocomplete="tel" maxlength="11" pattern="09[0-9]{9}" required placeholder="09xxxxxxxxx"></label>
+   <label class="field">استان<input id="cProvince" autocomplete="address-level1" maxlength="60" required></label>
+   <label class="field">شهر<input id="cCity" autocomplete="address-level2" maxlength="60" required></label>
+   <label class="field">آدرس کامل<textarea id="cAddress" autocomplete="street-address" maxlength="700" required></textarea></label>
+   <label class="field">کد پستی<input id="cPostal" inputmode="numeric" autocomplete="postal-code" maxlength="10"></label>
    <label class="field">توضیحات سفارش<textarea id="cNote"></textarea></label>
    <button class="btn" type="submit" id="checkoutBtn">ثبت نهایی سفارش</button>
    <div id="checkoutMsg"></div>
@@ -477,6 +477,7 @@ function validMoney(value){
 async function init(){
  await loadCategories();
  await loadProducts();
+ restoreCart();
  await loadShippingSettings();
  renderCart();
  syncProductRoute();
@@ -662,6 +663,31 @@ function closeProduct(){
 }
 window.addEventListener('popstate',syncProductRoute);
 
+const CART_STORAGE_KEY='ram_online_cart_v1';
+function persistCart(){
+ try{
+  localStorage.setItem(CART_STORAGE_KEY,JSON.stringify(cart.map(item=>({id:item.id,qty:item.qty}))));
+ }catch(error){
+  console.warn('سبد خرید در این مرورگر ذخیره نشد.',error);
+ }
+}
+function restoreCart(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(CART_STORAGE_KEY)||'[]');
+  if(!Array.isArray(saved))return;
+  cart=saved.map(item=>{
+   const id=Number(item?.id),qty=Number(item?.qty);
+   const product=products.find(p=>Number(p.id)===id);
+   if(!product||!Number.isSafeInteger(qty)||qty<1)return null;
+   const stock=Math.max(0,Number(product.stock)||0);
+   if(stock<1)return null;
+   return {id:product.id,name:product.name,price:productPrice(product),qty:Math.min(qty,stock),stock};
+  }).filter(Boolean);
+ }catch(error){
+  cart=[];
+  console.warn('سبد خرید ذخیره‌شده قابل بازیابی نبود.',error);
+ }
+}
 function addToCart(id){
  const p=products.find(x=>Number(x.id)===Number(id));
  if(!p)return;
@@ -678,6 +704,7 @@ function addToCart(id){
 }
 
 function renderCart(){
+ persistCart();
  $('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0).toLocaleString('fa-IR');
  $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartline">
   <div><b>${esc(x.name)}</b><div class="small">${money(x.price)} × ${x.qty}</div></div>
