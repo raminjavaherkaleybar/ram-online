@@ -24,7 +24,8 @@ for (const p of products) {
   const id = String(p.id);
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) continue;
   const name = clean(p.name);
-  const desc = clean(p.description || p.details || p.short_description || ("خرید " + name + " از فروشگاه رام آنلاین؛ مشاهده تصاویر و ثبت سفارش اینترنتی."));
+  const rawDesc = clean(p.description || p.details || p.short_description);
+  const desc = (rawDesc.length >= 70 ? rawDesc : clean(rawDesc + " خرید " + name + " از فروشگاه رام آنلاین؛ مشاهده تصاویر، قیمت و موجودی ثبت‌شده و ثبت سفارش اینترنتی.")).slice(0,160);
   const img = clean(p.image_url);
   const canonical = root + "/products/" + encodeURIComponent(id) + "/";
   const salePriceToman = Number(p.sale_price);
@@ -33,19 +34,19 @@ for (const p of products) {
     ? discountPriceToman
     : salePriceToman;
   const offer = Number.isFinite(currentPriceToman) && currentPriceToman > 0
-    ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":"https://schema.org/OutOfStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted"}}
+    ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":(Number(p.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock"),"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted"}}
     : null;
   const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
   const html = [
     "<!doctype html><html lang=\"fa\" dir=\"rtl\"><head><meta charset=\"utf-8\">",
     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
     "<title>" + esc(name) + " | خرید از رام آنلاین</title>",
-    "<meta name=\"description\" content=\"" + esc(desc.slice(0,300)) + "\">",
+    "<meta name=\"description\" content=\"" + esc(desc) + "\">",
     "<meta name=\"robots\" content=\"index,follow,max-image-preview:large\">",
     "<link rel=\"canonical\" href=\"" + esc(canonical) + "\">",
     "<meta property=\"og:type\" content=\"product\"><meta property=\"og:site_name\" content=\"رام آنلاین | RAMIN JAVAHER\">",
     "<meta property=\"og:title\" content=\"" + esc(name) + " | خرید از رام آنلاین\">",
-    "<meta property=\"og:description\" content=\"" + esc(desc.slice(0,300)) + "\">",
+    "<meta property=\"og:description\" content=\"" + esc(desc) + "\">",
     "<meta property=\"og:url\" content=\"" + esc(canonical) + "\">",
     (img ? "<meta property=\"og:image\" content=\"" + esc(img) + "\">" : ""),
     "<script type=\"application/ld+json\">" + JSON.stringify(schema).replace(/</g,"\\u003c") + "</scr" + "ipt>",
@@ -55,6 +56,7 @@ for (const p of products) {
     "<h1>" + esc(name) + "</h1>",
     (img ? "<img src=\"" + esc(img) + "\" alt=\"" + esc(name) + "\" loading=\"eager\">" : ""),
     "<p class=\"desc\">" + esc(desc) + "</p>",
+    "<section><h2>قیمت و موجودی محصول</h2><p>قیمت ثبت‌شده: " + (Number.isFinite(currentPriceToman) && currentPriceToman > 0 ? Math.round(currentPriceToman).toLocaleString("fa-IR") + " تومان" : "برای اطلاع از قیمت تماس بگیرید") + "</p><p>وضعیت موجودی: " + (Number(p.stock) > 0 ? "موجود در انبار" : "در حال حاضر ناموجود") + "</p><p>برای مشاهده تصاویر محصول و تکمیل سفارش اینترنتی، وارد صفحه سفارش شوید.</p></section>",
     "<a href=\"/?product=" + encodeURIComponent(id) + "\">مشاهده محصول و ثبت سفارش</a>",
     "<p><small>فروشگاه اینترنتی بدلیجات و زیورآلات رام آنلاین</small></p></main></body></html>"
   ].join("\n");
