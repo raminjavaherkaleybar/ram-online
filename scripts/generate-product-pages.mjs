@@ -37,6 +37,21 @@ for (const p of products) {
     ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":(Number(p.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock"),"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted"}}
     : null;
   const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
+  const materialGuide = /استیل/i.test(name + " " + desc)
+    ? "برای نگهداری بهتر زیورآلات استیل، پس از استفاده آن را با دستمال نرم و خشک تمیز کنید، از تماس طولانی با مواد شوینده و عطر جلوگیری کنید و آن را جدا از زیورآلات دیگر نگهداری کنید."
+    : "برای نگهداری بهتر بدلیجات، پس از استفاده آن را با دستمال نرم تمیز کنید، از تماس مستقیم با مواد شوینده و عطر جلوگیری کنید و در جای خشک نگهداری کنید.";
+  const productGuide = [
+    "<section class=\"buying-guide\">",
+    "<h2>راهنمای خرید " + esc(name) + "</h2>",
+    "<p>در این صفحه می‌توانید تصاویر و توضیحات ثبت‌شده برای " + esc(name) + " را بررسی کنید. قیمت و وضعیت موجودی نمایش‌داده‌شده بر اساس اطلاعات فعلی فروشگاه رام آنلاین است و ممکن است با تغییر موجودی یا قیمت به‌روزرسانی شود.</p>",
+    "<h3>پیش از ثبت سفارش</h3>",
+    "<ul><li>تصاویر محصول را با دقت بررسی کنید.</li><li>قیمت و وضعیت موجودی را پیش از افزودن به سبد خرید کنترل کنید.</li><li>اگر درباره اندازه، رنگ یا جزئیاتی که در توضیحات نیامده سؤال دارید، پیش از نهایی‌کردن سفارش از فروشگاه راهنمایی بگیرید.</li></ul>",
+    "<h3>روش سفارش</h3>",
+    "<p>برای مشاهده صفحه سفارش، انتخاب تعداد و افزودن محصول به سبد خرید، دکمه مشاهده محصول و ثبت سفارش را انتخاب کنید. سپس اطلاعات لازم برای ثبت و پیگیری سفارش را وارد کنید.</p>",
+    "<h3>نکات نگهداری</h3>",
+    "<p>" + esc(materialGuide) + "</p>",
+    "</section>"
+  ].join("");
   const html = [
     "<!doctype html><html lang=\"fa\" dir=\"rtl\"><head><meta charset=\"utf-8\">",
     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
@@ -56,6 +71,7 @@ for (const p of products) {
     "<h1>" + esc(name) + "</h1>",
     (img ? "<img src=\"" + esc(img) + "\" alt=\"" + esc(name) + "\" loading=\"eager\">" : ""),
     "<p class=\"desc\">" + esc(desc) + "</p>",
+    productGuide,
     "<section><h2>قیمت و موجودی محصول</h2><p>قیمت ثبت‌شده: " + (Number.isFinite(currentPriceToman) && currentPriceToman > 0 ? Math.round(currentPriceToman).toLocaleString("fa-IR") + " تومان" : "برای اطلاع از قیمت تماس بگیرید") + "</p><p>وضعیت موجودی: " + (Number(p.stock) > 0 ? "موجود در انبار" : "در حال حاضر ناموجود") + "</p><p>برای مشاهده تصاویر محصول و تکمیل سفارش اینترنتی، وارد صفحه سفارش شوید.</p></section>",
     "<a href=\"/?product=" + encodeURIComponent(id) + "\">مشاهده محصول و ثبت سفارش</a>",
     "<p><small>فروشگاه اینترنتی بدلیجات و زیورآلات رام آنلاین</small></p></main></body></html>"
