@@ -673,6 +673,22 @@ body{font-size:14px;overflow-x:hidden}
 }
 .hero-tag,.hero h1,.hero p{ text-shadow:0 2px 9px rgba(0,0,0,.58); }
 
+
+/* حساب مشتری و ورود پیامکی */
+#customerModal .modalbox{width:min(560px,100%)}
+#customerModal .field{min-width:0}
+#customerModal .row{align-items:center}
+#customerModal .row .btn{flex:1}
+#customerOrders .order-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px;margin:10px 0}
+#customerOrders .order-card h5{margin:0 0 7px;font-size:14px}
+#customerOrders .order-card p{margin:5px 0;font-size:12px;line-height:1.9}
+#customerOrders .order-card .order-items{color:var(--muted);font-size:11px}
+@media(max-width:600px){
+ #customerAccountOpen{flex:1 1 calc(33.333% - 7px)}
+ #customerModal .row{display:grid;grid-template-columns:1fr}
+ #customerModal .row .btn{width:100%}
+}
+
 </style>
 
 <script type="application/ld+json">
@@ -724,6 +740,7 @@ body{font-size:14px;overflow-x:hidden}
   </div>
   <div class="head-actions">
    <button class="btn" id="cartOpen">سبد خرید <span id="cartCount">۰</span></button>
+   <button class="btn light" id="customerAccountOpen" type="button">ورود مشتری</button>
    <button class="btn light" onclick="document.getElementById('trackingSection').scrollIntoView({behavior:'smooth'})">پیگیری سفارش</button>
    <button class="btn outline admin-link" id="adminOpen">مدیریت</button>
    <a class="btn light header-guide-link" href="/guide/" style="display:inline-block;text-decoration:none">راهنمای خرید</a>
@@ -988,6 +1005,43 @@ body{font-size:14px;overflow-x:hidden}
  </div>
 </div>
 
+
+<div id="customerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="customerModalTitle">
+ <div class="modalbox">
+  <div class="modal-head">
+   <h3 id="customerModalTitle">حساب مشتری رام آنلاین</h3>
+   <button class="btn light" id="customerModalClose" type="button">بستن</button>
+  </div>
+  <div id="customerSignedOut">
+   <p class="small muted">برای ورود یا ساخت حساب مشتری، شماره موبایل خود را وارد کنید. کد تأیید از طریق پیامک ارسال می‌شود.</p>
+   <form id="customerPhoneForm">
+    <label class="field">شماره موبایل ایران
+     <input id="customerPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required>
+    </label>
+    <button class="btn" id="customerSendOtp" type="submit">ارسال کد تأیید</button>
+    <div id="customerPhoneMsg" aria-live="polite"></div>
+   </form>
+   <form id="customerOtpForm" class="hidden">
+    <p class="small">کد پیامک‌شده به <b id="customerOtpPhone" dir="ltr"></b> را وارد کنید.</p>
+    <label class="field">کد تأیید پیامکی
+     <input id="customerOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9۰-۹٠-٩]{4,10}" required>
+    </label>
+    <div class="row">
+     <button class="btn" id="customerVerifyOtp" type="submit">تأیید و ورود</button>
+     <button class="btn light" id="customerResendOtp" type="button">ارسال دوباره کد</button>
+    </div>
+    <div id="customerOtpMsg" aria-live="polite"></div>
+   </form>
+  </div>
+  <div id="customerSignedIn" class="hidden">
+   <div class="notice ok">وارد حساب مشتری شده‌اید: <b id="customerPhoneDisplay" dir="ltr"></b></div>
+   <h4>سفارش‌های من</h4>
+   <div id="customerOrders"><div class="empty">در حال دریافت سفارش‌ها...</div></div>
+   <button class="btn light" id="customerSignOut" type="button">خروج از حساب مشتری</button>
+  </div>
+ </div>
+</div>
+
 <script>
 'use strict';
 
@@ -1005,6 +1059,167 @@ const money=n=>Number(n||0).toLocaleString('fa-IR')+' تومان';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const msg=(id,text,type='')=>{$(id).innerHTML=text?`<div class="notice ${type}">${esc(text)}</div>`:''};
 const errText=e=>e?.message||e?.error_description||String(e||'خطای نامشخص');
+
+/* احراز هویت مشتری با OTP؛ فضای ذخیره‌سازی جدا از ورود مدیر */
+const customerAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+ auth:{storageKey:'ram-online-customer-auth',autoRefreshToken:true,persistSession:true,detectSessionInUrl:false}
+});
+let pendingCustomerPhone='';
+
+function toIranE164(value){
+ let digits=normalizeDigits(value).replace(/\D/g,'');
+ if(digits.startsWith('0098'))digits=digits.slice(2);
+ if(/^989\d{9}$/.test(digits))return '+'+digits;
+ if(/^09\d{9}$/.test(digits))return '+98'+digits.slice(1);
+ if(/^9\d{9}$/.test(digits))return '+98'+digits;
+ throw new Error('شماره موبایل معتبر نیست. شماره را به شکل ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
+}
+
+function customerStatusLabel(value){
+ return ({pending:'در انتظار بررسی',confirmed:'تأیید شده',processing:'در حال آماده‌سازی',shipped:'ارسال شده',delivered:'تحویل شده',cancelled:'لغو شده'})[value]||value||'نامشخص';
+}
+
+async function loadCustomerOrders(){
+ const box=$('customerOrders');
+ if(!box)return;
+ box.innerHTML='<div class="empty">در حال دریافت سفارش‌ها...</div>';
+ try{
+  const {data:customers,error:customerError}=await customerAuth.from('customers')
+   .select('id,full_name,mobile').order('created_at',{ascending:false}).limit(100);
+  if(customerError)throw customerError;
+  const customerIds=(customers||[]).map(c=>c.id);
+  if(!customerIds.length){
+   box.innerHTML='<div class="empty">برای این شماره هنوز سفارشی ثبت نشده است. می‌توانید با همین شماره خرید کنید تا سفارش‌ها در این حساب نمایش داده شوند.</div>';
+   return;
+  }
+  const {data:orders,error:ordersError}=await customerAuth.from('orders')
+   .select('id,customer_id,total_amount,shipping_cost,status,tracking_code,created_at,payment_status')
+   .in('customer_id',customerIds).order('created_at',{ascending:false}).limit(100);
+  if(ordersError)throw ordersError;
+  if(!orders||!orders.length){
+   box.innerHTML='<div class="empty">هنوز سفارشی برای این حساب ثبت نشده است.</div>';
+   return;
+  }
+  const orderIds=orders.map(o=>o.id);
+  const {data:items,error:itemsError}=await customerAuth.from('order_items')
+   .select('order_id,quantity,unit_price').in('order_id',orderIds);
+  if(itemsError)throw itemsError;
+  const lines=items||[];
+  box.innerHTML=orders.map(o=>{
+   const orderLines=lines.filter(i=>String(i.order_id)===String(o.id));
+   const quantity=orderLines.reduce((sum,i)=>sum+Number(i.quantity||0),0);
+   const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR'):'—';
+   return '<article class="order-card">'+
+    '<h5>سفارش شماره '+esc(o.id)+'</h5>'+
+    '<p>وضعیت: <b>'+esc(customerStatusLabel(o.status))+'</b></p>'+
+    '<p>تاریخ ثبت: '+esc(date)+'</p>'+
+    '<p>تعداد کالا: '+quantity.toLocaleString('fa-IR')+'</p>'+
+    '<p>مبلغ کل: <b>'+money(o.total_amount)+'</b></p>'+
+    '<p>هزینه ارسال: '+money(o.shipping_cost)+'</p>'+
+    '<p>کد رهگیری: '+(o.tracking_code?'<b>'+esc(o.tracking_code)+'</b>':'هنوز ثبت نشده')+'</p>'+
+    '</article>';
+  }).join('');
+ }catch(error){
+  console.error('دریافت سفارش‌های مشتری:',error);
+  box.innerHTML='<div class="notice error">دریافت سفارش‌ها انجام نشد: '+esc(errText(error))+'</div>';
+ }
+}
+
+async function renderCustomerAccount(session){
+ if(session===undefined){
+  const result=await customerAuth.auth.getSession();
+  session=result.data?.session||null;
+ }
+ const signedIn=!!(session&&session.user&&session.user.phone);
+ $('customerSignedOut').classList.toggle('hidden',signedIn);
+ $('customerSignedIn').classList.toggle('hidden',!signedIn);
+ $('customerAccountOpen').textContent=signedIn?'حساب من':'ورود مشتری';
+ if(signedIn){
+  $('customerPhoneDisplay').textContent=session.user.phone;
+  await loadCustomerOrders();
+ }else{
+  $('customerPhoneForm').classList.remove('hidden');
+  $('customerOtpForm').classList.add('hidden');
+  $('customerPhoneMsg').innerHTML='';
+  $('customerOtpMsg').innerHTML='';
+ }
+}
+
+async function sendCustomerOtp(){
+ try{
+  pendingCustomerPhone=toIranE164($('customerPhone').value);
+  const button=$('customerSendOtp');
+  button.disabled=true;
+  msg('customerPhoneMsg','در حال ارسال کد تأیید...');
+  const {error}=await customerAuth.auth.signInWithOtp({
+   phone:pendingCustomerPhone,
+   options:{shouldCreateUser:true}
+  });
+  if(error)throw error;
+  $('customerOtpPhone').textContent=pendingCustomerPhone;
+  $('customerPhoneForm').classList.add('hidden');
+  $('customerOtpForm').classList.remove('hidden');
+  msg('customerPhoneMsg','کد تأیید ارسال شد.','ok');
+  msg('customerOtpMsg','کد پیامک‌شده را وارد کنید.','ok');
+ }catch(error){
+  console.error('ارسال کد ورود مشتری:',error);
+  msg('customerPhoneMsg','ارسال کد انجام نشد: '+errText(error),'error');
+ }finally{
+  $('customerSendOtp').disabled=false;
+ }
+}
+
+$('customerAccountOpen').addEventListener('click',async()=>{
+ $('customerModal').classList.remove('hidden');
+ await renderCustomerAccount();
+});
+$('customerModalClose').addEventListener('click',()=>$('customerModal').classList.add('hidden'));
+$('customerPhoneForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ await sendCustomerOtp();
+});
+$('customerResendOtp').addEventListener('click',sendCustomerOtp);
+$('customerOtpForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const button=$('customerVerifyOtp');
+ button.disabled=true;
+ try{
+  const token=normalizeDigits($('customerOtp').value).replace(/\D/g,'');
+  if(!pendingCustomerPhone)throw new Error('شماره موبایل را دوباره وارد کنید و کد تازه بگیرید.');
+  if(!/^[0-9]{4,10}$/.test(token))throw new Error('کد تأیید باید بین ۴ تا ۱۰ رقم باشد.');
+  msg('customerOtpMsg','در حال بررسی کد...');
+  const {data,error}=await customerAuth.auth.verifyOtp({
+   phone:pendingCustomerPhone,token,type:'sms'
+  });
+  if(error)throw error;
+  if(!data.session)throw new Error('ورود تأیید شد اما نشست کاربری دریافت نشد؛ دوباره تلاش کنید.');
+  pendingCustomerPhone='';
+  $('customerOtpForm').classList.add('hidden');
+  await renderCustomerAccount(data.session);
+  msg('customerOtpMsg','ورود با موفقیت انجام شد.','ok');
+ }catch(error){
+  console.error('تأیید کد مشتری:',error);
+  msg('customerOtpMsg','ورود انجام نشد: '+errText(error),'error');
+ }finally{
+  button.disabled=false;
+ }
+});
+$('customerSignOut').addEventListener('click',async()=>{
+ const {error}=await customerAuth.auth.signOut();
+ if(error){
+  msg('customerOrders','خروج انجام نشد: '+errText(error),'error');
+  return;
+ }
+ pendingCustomerPhone='';
+ $('customerOtp').value='';
+ await renderCustomerAccount(null);
+});
+customerAuth.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_IN'||event==='SIGNED_OUT'){
+  setTimeout(()=>renderCustomerAccount(session),0);
+ }
+});
+
 
 function normalizeDigits(value){
  return String(value||'')
@@ -1076,6 +1291,7 @@ async function init(){
  syncProductRoute();
  const {data:{session}}=await db.auth.getSession();
  if(session)await verifyAdmin(false);
+ await renderCustomerAccount();
 }
 
 async function loadCategories(){
