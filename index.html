@@ -2439,7 +2439,6 @@ function printOrder(id){
   const closer=document.getElementById(closeId);
   if(!modal)return;
   const close=()=>{
-   if(modal.classList.contains('hidden'))return;
    modal.classList.add('hidden');
    if(opener)opener.focus();
   };
