@@ -326,6 +326,22 @@ a{color:inherit}
  .google-search-hint{font-size:7px!important}
 }
 
+
+/* کوچک‌تر کردن کارت تبلیغاتی اصلی، بدون تغییر تصویر و متن */
+.hero{min-height:310px;padding:clamp(18px,4vw,42px);margin-top:18px;border-radius:22px}
+.hero-content{max-width:470px}
+.hero-tag{padding:6px 11px;font-size:11px;margin-bottom:10px}
+.hero h1{font-size:clamp(27px,4.5vw,44px);line-height:1.4;margin-bottom:6px}
+.hero p{font-size:14px;line-height:1.8;margin-bottom:16px}
+.hero .btn{padding:9px 15px;font-size:13px}
+@media(max-width:650px){
+ .hero{min-height:235px;margin-top:12px;border-radius:16px;padding:17px 15px}
+ .hero-tag{font-size:9px;padding:5px 8px;margin-bottom:7px}
+ .hero h1{font-size:clamp(22px,6vw,27px);line-height:1.45}
+ .hero p{font-size:11px;line-height:1.7;margin-bottom:12px}
+ .hero .btn{padding:8px 12px;font-size:12px}
+}
+
 </style>
 
 <script type="application/ld+json">
