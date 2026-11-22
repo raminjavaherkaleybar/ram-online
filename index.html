@@ -965,6 +965,24 @@ body{font-size:14px}
   .market-item{padding:4px 5px!important}
 }
 
+
+/* کاهش اندازه کادر معرفی اصلی شامل جستجوی گوگل */
+.hero{
+  width:min(94%,1080px)!important;
+  min-height:165px!important;
+  margin:14px auto 0!important;
+  padding:12px clamp(12px,2vw,20px)!important;
+  border-radius:20px!important;
+}
+.hero-content{width:100%!important;max-width:470px!important}
+@media(max-width:650px){
+  .hero{width:92%!important;min-height:138px!important;margin:10px auto 0!important;padding:9px 9px!important;border-radius:15px!important}
+  .hero-content{max-width:100%!important}
+}
+@media(max-width:360px){
+  .hero{width:91%!important;min-height:132px!important;padding:8px!important}
+}
+
 </style>
 
 <script type="application/ld+json">
