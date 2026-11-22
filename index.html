@@ -1034,6 +1034,13 @@ body{font-size:14px}
   .google-search-hint{font-size:7px!important}
 }
 
+
+/* دکمه‌های دسترسی سریع کنار مدیریت */
+.header-guide-link,.header-products-link{white-space:nowrap;text-align:center}
+@media(max-width:600px){
+ .head-actions{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:7px}
+ .head-actions .btn,.head-actions a.btn{flex:1 1 calc(33.333% - 7px);min-width:0;padding:9px 7px;font-size:11px;text-align:center}
+}
 </style>
 
 <script type="application/ld+json">
@@ -1087,6 +1094,8 @@ body{font-size:14px}
    <button class="btn" id="cartOpen">سبد خرید <span id="cartCount">۰</span></button>
    <button class="btn light" onclick="document.getElementById('trackingSection').scrollIntoView({behavior:'smooth'})">پیگیری سفارش</button>
    <button class="btn outline admin-link" id="adminOpen">مدیریت</button>
+   <a class="btn light header-guide-link" href="/guide/" style="display:inline-block;text-decoration:none">راهنمای خرید</a>
+   <a class="btn header-products-link" href="#shop" style="display:inline-block;text-decoration:none">مشاهده محصولات</a>
   </div>
  </div>
 </header>
