@@ -261,6 +261,17 @@ a{color:inherit}
 .market-status.stale{color:#a15b24}
 @media(max-width:650px){.market-panel{padding:13px;margin:14px 0 20px}.market-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.market-item{padding:11px}.market-item strong{font-size:14px}.market-clock strong{font-size:21px}}
 
+
+/* جستجوی گوگل */
+.google-search-panel{margin:0 0 24px;padding:16px;border:1px solid #eadfce;border-radius:16px;background:#fffdf9}
+.google-search-title{font-size:16px;color:#30271f;margin:0 0 10px}
+.google-search-form{display:flex;gap:8px}
+.google-search-input{flex:1;min-width:0;border:1px solid #dfd3c4;border-radius:24px;padding:12px 16px;font:inherit;font-size:14px;outline:none;background:#fff}
+.google-search-input:focus{border-color:#a88962;box-shadow:0 0 0 3px #a889621c}
+.google-search-submit{border:0;border-radius:24px;padding:11px 20px;background:#30271f;color:#fff;font:inherit;cursor:pointer}
+.google-search-hint{display:block;color:#8b7b69;font-size:11px;margin-top:8px}
+@media(max-width:480px){.google-search-panel{padding:13px}.google-search-submit{padding:10px 14px}}
+
 </style>
 
 <script type="application/ld+json">
@@ -350,8 +361,17 @@ a{color:inherit}
  </div>
  <div class="market-meta">
   <span id="marketUpdated">زمان آخرین دریافت: —</span>
-  <span id="marketStatus" class="market-status">منبع: داده‌های بازار ایران</span>
+  <span id="marketStatus" class="market-status">منبع: نرخ‌آرا · بازار آزاد ایران</span>
  </div>
+</section>
+
+ <section class="google-search-panel" aria-label="جستجوی گوگل">
+ <h2 class="google-search-title">جستجو در گوگل</h2>
+ <form class="google-search-form" action="https://www.google.com/search" method="get" target="_blank" rel="noopener">
+  <input class="google-search-input" type="search" name="q" placeholder="چی می‌خوای پیدا کنی؟" aria-label="عبارت جستجو در گوگل" required>
+  <button class="google-search-submit" type="submit">جستجو</button>
+ </form>
+ <small class="google-search-hint">نتایج جستجو در صفحه‌ای جدید باز می‌شوند.</small>
 </section>
 
  <section class="section" id="shop">
@@ -1598,7 +1618,7 @@ font-size:13px;box-shadow:0 4px 15px #0003;">
 
 /* ساعت تهران و نرخ‌های بازار ایران */
 (function(){
- const api='https://raw.githubusercontent.com/iran-market/iran-market.github.io/main/data/popular.json';
+ const api='https://nerkhara.com/api/v1/latest.json';
  const numberFormat=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
  const timeFormat=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
  const dateFormat=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -1620,16 +1640,18 @@ font-size:13px;box-shadow:0 4px 15px #0003;">
    const response=await fetch(api+'?v='+Date.now(),{cache:'no-store'});
    if(!response.ok)throw new Error('HTTP '+response.status);
    const payload=await response.json();
-   if(!payload||!Array.isArray(payload.data))throw new Error('ساختار پاسخ معتبر نیست');
-   const bySymbol=Object.fromEntries(payload.data.map(item=>[item.symbol,item]));
-   showPrice('marketUsd',bySymbol.USD_IRR_FREE);
-   showPrice('marketEur',bySymbol.EUR_IRR_FREE);
-   showPrice('marketGold',bySymbol.GOLD_18K_IRR);
-   showPrice('marketCoin',bySymbol.COIN_EMAMI_IRR);
-   const stale=Boolean(payload.meta&&payload.meta.stale)||payload.data.some(item=>item.stale);
-   const updated=(payload.meta&&payload.meta.updated_at)||payload.data[0]?.timestamp;
-   $id('marketUpdated').textContent='آخرین به‌روزرسانی منبع: '+(updated?new Date(updated).toLocaleString('fa-IR',{timeZone:'Asia/Tehran'}):'نامشخص');
-   status.textContent=stale?'هشدار: دادهٔ دریافتی ممکن است قدیمی باشد':'منبع: Iran Market Data · بازار آزاد ایران';
+   if(!payload||!Array.isArray(payload.items))throw new Error('ساختار پاسخ معتبر نیست');
+   const byId=Object.fromEntries(payload.items.map(item=>[item.id,item]));
+   const usd=byId.usd,eur=byId.eur,gold=byId['gold-18k'],coin=byId['coin-emami'];
+   showPrice('marketUsd',usd);
+   showPrice('marketEur',eur);
+   showPrice('marketGold',gold);
+   showPrice('marketCoin',coin);
+   const items=[usd,eur,gold,coin].filter(Boolean);
+   const stale=items.some(item=>item.stale);
+   const newest=items.map(item=>item.updated_utc).filter(Boolean).sort().at(-1);
+   $id('marketUpdated').textContent='آخرین دریافت منبع: '+(newest?new Date(newest+'Z').toLocaleString('fa-IR',{timeZone:'Asia/Tehran'}):'نامشخص');
+   status.textContent=stale?'هشدار: یک یا چند قیمت قدیمی است':'منبع: نرخ‌آرا · به‌روزرسانی منبع حدود هر ۱۰ دقیقه';
    status.classList.toggle('stale',stale);
   }catch(error){
    console.error('Market data error:',error);
@@ -1647,7 +1669,7 @@ font-size:13px;box-shadow:0 4px 15px #0003;">
  setInterval(tick,1000);
  $id('marketRefresh').addEventListener('click',loadMarket);
  loadMarket();
- setInterval(loadMarket,30*60*1000);
+ setInterval(loadMarket,60*1000);
 })();
 
 </script> 
