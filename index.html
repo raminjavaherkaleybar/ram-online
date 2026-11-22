@@ -1973,47 +1973,7 @@ function printOrder(id){
  <p style="text-align:center">از خرید شما سپاسگزاریم</p>
  <script>window.onload=()=>window.print()<\/script>
  
-<script>
-/* بهبود دسترس‌پذیری پنجره‌های سبد خرید و ورود مدیر */
-(function(){
- const pairs=[
-  {modal:'cartModal',open:'cartOpen',close:'cartClose'},
-  {modal:'loginModal',open:'adminOpen',close:'loginClose'}
- ];
- pairs.forEach(({modal:modalId,open:openId,close:closeId})=>{
-  const modal=document.getElementById(modalId);
-  const opener=document.getElementById(openId);
-  const closer=document.getElementById(closeId);
-  if(!modal)return;
-  const close=()=>{
-   modal.classList.add('hidden');
-   if(opener)opener.focus();
-  };
-  if(opener)opener.addEventListener('click',()=>{
-   const first=modal.querySelector('button,input,select,textarea,[href]');
-   if(first)first.focus();
-  });
-  if(closer)closer.addEventListener('click',close);
-  modal.addEventListener('click',event=>{
-   if(event.target===modal)close();
-  });
-  modal.addEventListener('keydown',event=>{
-   if(event.key==='Escape'){event.stopPropagation();close();}
-  });
- });
- document.addEventListener('keydown',event=>{
-  if(event.key!=='Escape')return;
-  pairs.forEach(({modal})=>{
-   const el=document.getElementById(modal);
-   if(el&&!el.classList.contains('hidden')){
-    el.classList.add('hidden');
-    const opener=document.getElementById(modal==='cartModal'?'cartOpen':'adminOpen');
-    if(opener)opener.focus();
-   }
-  });
- });
-})();
-</script>
+
 
 </body></html>`);
  w.document.close();
