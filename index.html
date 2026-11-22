@@ -1041,6 +1041,19 @@ body{font-size:14px}
  .head-actions{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:7px}
  .head-actions .btn,.head-actions a.btn{flex:1 1 calc(33.333% - 7px);min-width:0;padding:9px 7px;font-size:11px;text-align:center}
 }
+
+/* بزرگ‌تر کردن لوگوی سربرگ بدون به‌هم‌زدن چیدمان */
+.brand-logo{width:82px!important;height:82px!important;flex:0 0 82px!important;object-fit:contain!important}
+.brand-wrap{gap:12px!important}
+.head{min-height:94px}
+@media(max-width:600px){
+ .brand-logo{width:76px!important;height:76px!important;flex:0 0 76px!important}
+ .brand-wrap{gap:9px!important}
+ .head{min-height:0}
+}
+@media(max-width:360px){
+ .brand-logo{width:68px!important;height:68px!important;flex:0 0 68px!important}
+}
 </style>
 
 <script type="application/ld+json">
