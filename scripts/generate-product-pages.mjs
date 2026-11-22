@@ -6,7 +6,12 @@ const url = source.match(/const SUPABASE_URL='([^']+)'/)?.[1];
 const key = source.match(/const SUPABASE_KEY='([^']+)'/)?.[1];
 if (!url || !key) throw new Error("Supabase public configuration was not found in index.html.");
 
-const response = await fetch(url + "/rest/v1/catalog_products?select=*&order=created_at.desc", {
+const productQuery = new URLSearchParams({
+  select: "id,name,description,code,image_url,sale_price,discount_price,stock,is_active,created_at",
+  is_active: "eq.true",
+  order: "created_at.desc"
+});
+const response = await fetch(url + "/rest/v1/catalog_products?" + productQuery.toString(), {
   headers: { apikey: key, Authorization: "Bearer " + key }
 });
 if (!response.ok) throw new Error("Supabase product fetch failed: " + response.status + " " + (await response.text()));
@@ -36,7 +41,7 @@ for (const p of products) {
   const offer = Number.isFinite(currentPriceToman) && currentPriceToman > 0
     ? {"@type":"Offer","price":String(Math.round(currentPriceToman * 10)),"priceCurrency":"IRR","url":canonical,"availability":(Number(p.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock")}
     : null;
-  const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
+  const schema = {"@context":"https://schema.org","@type":"Product",name,description:desc,url:canonical,brand:{"@type":"Brand","name":"RAMIN JAVAHER"},...(clean(p.code)?{sku:clean(p.code)}:{}),...(img?{image:[img]}:{}),...(offer?{offers:offer}:{})};
   const materialGuide = /استیل/i.test(name + " " + desc)
     ? "برای نگهداری بهتر زیورآلات استیل، پس از استفاده آن را با دستمال نرم و خشک تمیز کنید، از تماس طولانی با مواد شوینده و عطر جلوگیری کنید و آن را جدا از زیورآلات دیگر نگهداری کنید."
     : "برای نگهداری بهتر بدلیجات، پس از استفاده آن را با دستمال نرم تمیز کنید، از تماس مستقیم با مواد شوینده و عطر جلوگیری کنید و در جای خشک نگهداری کنید.";
