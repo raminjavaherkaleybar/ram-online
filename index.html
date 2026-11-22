@@ -2287,7 +2287,8 @@ function renderAdminSalesReport(){
   grouped[key].orders++;grouped[key].subtotal+=getOrderSubtotal(o);grouped[key].total+=Number(o.total_amount||0);
  });
  const rows=Object.values(grouped).sort((a,b)=>b.year-a.year||b.month-a.month);
- const monthName=m=>new Intl.DateTimeFormat('fa-IR-u-ca-persian',{month:'long',timeZone:'Asia/Tehran'}).format(new Date(Date.UTC(2026,m-1,15,12)));
+ const persianMonths=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+ const monthName=m=>persianMonths[m-1]||'ماه نامشخص';
  const stat=(value,label)=>'<div class="admin-stat"><b>'+value+'</b><span>'+label+'</span></div>';
  box.innerHTML=
   '<div class="admin-summary">'+
