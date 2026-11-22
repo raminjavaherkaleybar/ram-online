@@ -289,7 +289,7 @@ a{color:inherit}
 <header class="header">
  <div class="wrap head">
   <div class="brand-wrap">
-   <img class="brand-logo" src="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/%20(1).imagesaving" alt="لوگوی رام آنلاین" onerror="this.style.display='none'">
+   <img class="brand-logo" src="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/%20(1).imagesaving" alt="لوگوی رام آنلاین" width="66" height="66" loading="eager" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
    <div class="brand">فروشگاه بدلیجات رام آنلاین<small>RAMIN JAVAHER</small></div>
   </div>
   <div class="head-actions">
@@ -671,8 +671,8 @@ function openProduct(id,updateHistory=true){
  detail.innerHTML=`<button class="btn light detail-back" onclick="closeProduct()">→ بازگشت به محصولات</button>
   <div class="product-detail">
    <div class="detail-gallery">
-    <img id="detailMainImage" class="detail-main-image" src="${esc(images[0]||'')}" alt="${esc(p.name)}" onclick="window.open(this.src,'_blank','noopener')" onerror="this.style.display='none'">
-    <div class="detail-thumbs">${images.map((url,i)=>`<img class="detail-thumb ${i===0?'active':''}" src="${esc(url)}" alt="تصویر ${i+1}" data-url="${esc(url)}" onclick="selectDetailImage(this)">`).join('')}</div>
+    <img id="detailMainImage" class="detail-main-image" src="${esc(images[0]||'')}" alt="${esc(p.name)}" loading="eager" decoding="async" fetchpriority="high" onclick="window.open(this.src,'_blank','noopener')" onerror="this.style.display='none'">
+    <div class="detail-thumbs">${images.map((url,i)=>`<img class="detail-thumb ${i===0?'active':''}" src="${esc(url)}" alt="تصویر ${i+1}" loading="lazy" decoding="async" data-url="${esc(url)}" onclick="selectDetailImage(this)">`).join('')}</div>
    </div>
    <div class="detail-info">
     <span class="badge">${esc(categoryName(p))}</span>
@@ -1141,7 +1141,7 @@ function renderAdminProducts(){
   const stockClass=stock<=3?'stock-alert':'stock-ok';
   const stockLabel=stock<=0?'ناموجود':stock<=3?'نیازمند تأمین موجودی':'موجودی کافی';
   return `<div class="admin-product row">
-   <img src="${esc(p.image_url||'')}" onerror="this.style.display='none'">
+   <img src="${esc(p.image_url||'')}" loading="lazy" decoding="async" onerror="this.style.display='none'">
    <div class="grow"><b>${esc(p.name)}</b>
     <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${stock.toLocaleString('fa-IR')}</div>
     <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span> <span class="badge ${stockClass}">${stockLabel}</span>
@@ -1302,7 +1302,7 @@ function showOrderDetails(id){
 
  const rows=(o.items||[]).map(i=>`
   <tr>
-   <td>${i.product?.image_url?`<img class="order-item-image" src="${esc(i.product.image_url)}" alt="${esc(i.product?.name||'محصول')}">`:'—'}</td>
+   <td>${i.product?.image_url?`<img class="order-item-image" src="${esc(i.product.image_url)}" alt="${esc(i.product?.name||'محصول')}" loading="lazy" decoding="async">`:'—'}</td>
    <td>${esc(i.product?.name||('محصول شماره '+i.product_id))}</td>
    <td>${Number(i.quantity||0).toLocaleString('fa-IR')}</td>
    <td>${money(i.unit_price)}</td>
@@ -1409,7 +1409,7 @@ function printOrder(id){
 
  const rows=(o.items||[]).map(i=>`
   <tr>
-   <td>${i.product?.image_url?`<img src="${esc(i.product.image_url)}" style="width:65px;height:65px;object-fit:cover;border-radius:8px">`:'—'}</td>
+   <td>${i.product?.image_url?`<img src="${esc(i.product.image_url)}" loading="lazy" decoding="async" style="width:65px;height:65px;object-fit:cover;border-radius:8px">`:'—'}</td>
    <td>${esc(i.product?.name||i.product_id)}</td>
    <td>${Number(i.quantity)}</td>
    <td>${money(i.unit_price)}</td>
