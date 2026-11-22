@@ -286,7 +286,7 @@ a{color:inherit}
 .market-item strong{font-size:13px;line-height:1.5}
 .market-item small{font-size:9px;margin-top:2px}
 .market-meta{font-size:9px;margin-top:8px;gap:5px}
-.google-search-panel{max-width:900px;margin:0 auto 15px;padding:10px 12px;border-radius:13px}
+.google-search-panel{display:block!important;visibility:visible!important;position:relative;z-index:1;width:100%;max-width:900px;margin:14px auto 15px;padding:10px 12px;border-radius:13px;opacity:1}
 .google-search-title{font-size:13px;margin-bottom:7px}
 .google-search-form{gap:6px}
 .google-search-input{padding:8px 12px;font-size:12px}
@@ -383,6 +383,15 @@ a{color:inherit}
   <div class="benefit"><b>✦ ارسال سراسری</b><span>ارسال به سراسر کشور</span></div>
  </section>
 
+ <section class="google-search-panel" aria-label="جستجوی گوگل">
+ <h2 class="google-search-title">جستجو در گوگل</h2>
+ <form class="google-search-form" action="https://www.google.com/search" method="get" target="_blank" rel="noopener">
+  <input class="google-search-input" type="search" name="q" placeholder="چی می‌خوای پیدا کنی؟" aria-label="عبارت جستجو در گوگل" required>
+  <button class="google-search-submit" type="submit">جستجو</button>
+ </form>
+ <small class="google-search-hint">نتایج جستجو در صفحه‌ای جدید باز می‌شوند.</small>
+</section>
+
  <section class="market-panel" id="marketInfo" aria-label="ساعت و قیمت‌های بازار">
  <div class="market-top">
   <div class="market-clock">
@@ -403,14 +412,7 @@ a{color:inherit}
  </div>
 </section>
 
- <section class="google-search-panel" aria-label="جستجوی گوگل">
- <h2 class="google-search-title">جستجو در گوگل</h2>
- <form class="google-search-form" action="https://www.google.com/search" method="get" target="_blank" rel="noopener">
-  <input class="google-search-input" type="search" name="q" placeholder="چی می‌خوای پیدا کنی؟" aria-label="عبارت جستجو در گوگل" required>
-  <button class="google-search-submit" type="submit">جستجو</button>
- </form>
- <small class="google-search-hint">نتایج جستجو در صفحه‌ای جدید باز می‌شوند.</small>
-</section>
+
 
  <section class="section" id="shop">
   <div class="section-head">
