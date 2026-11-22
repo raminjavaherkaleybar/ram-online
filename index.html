@@ -243,6 +243,24 @@ a{color:inherit}
 .store-intro p{font-size:14px}
 @media(max-width:600px){.store-intro h2{font-size:16px!important}.store-intro p{font-size:13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* ساعت و نرخ‌های بازار */
+.market-panel{margin:18px 0 26px;padding:18px;border:1px solid #eadfce;border-radius:18px;background:linear-gradient(135deg,#fffdf9,#f8f1e7);box-shadow:0 8px 24px #30271f0a}
+.market-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.market-clock{display:flex;align-items:center;gap:10px;color:#30271f}
+.market-clock strong{font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.market-clock small{display:block;color:#8a7967;font-size:11px;margin-top:3px}
+.market-refresh{border:1px solid #d9c8b0;border-radius:22px;background:#fffaf3;color:#5b4938;padding:8px 12px;font:inherit;font-size:12px;cursor:pointer}
+.market-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.market-item{background:#fff;border:1px solid #eee4d7;border-radius:13px;padding:13px;min-width:0}
+.market-item span{display:block;color:#847463;font-size:12px;margin-bottom:8px}
+.market-item strong{display:block;color:#30271f;font-size:16px;line-height:1.7;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.market-item small{display:block;color:#9b8b7b;font-size:10px;margin-top:4px}
+.market-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#8b7b69;font-size:10px;margin-top:12px}
+.market-status{color:#8b7b69}
+.market-status.stale{color:#a15b24}
+@media(max-width:650px){.market-panel{padding:13px;margin:14px 0 20px}.market-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.market-item{padding:11px}.market-item strong{font-size:14px}.market-clock strong{font-size:21px}}
+
 </style>
 
 <script type="application/ld+json">
@@ -315,6 +333,26 @@ a{color:inherit}
   <div class="benefit"><b>✦ خرید آسان</b><span>ثبت سفارش آنلاین</span></div>
   <div class="benefit"><b>✦ ارسال سراسری</b><span>ارسال به سراسر کشور</span></div>
  </section>
+
+ <section class="market-panel" id="marketInfo" aria-label="ساعت و قیمت‌های بازار">
+ <div class="market-top">
+  <div class="market-clock">
+   <span aria-hidden="true">◷</span>
+   <div><strong id="marketClock">--:--:--</strong><small id="marketDate">ساعت رسمی تهران</small></div>
+  </div>
+  <button class="market-refresh" id="marketRefresh" type="button">↻ به‌روزرسانی قیمت‌ها</button>
+ </div>
+ <div class="market-grid">
+  <div class="market-item"><span>دلار آزاد</span><strong id="marketUsd">در حال دریافت…</strong><small>تومان</small></div>
+  <div class="market-item"><span>یورو آزاد</span><strong id="marketEur">در حال دریافت…</strong><small>تومان</small></div>
+  <div class="market-item"><span>طلای ۱۸ عیار (هر گرم)</span><strong id="marketGold">در حال دریافت…</strong><small>تومان</small></div>
+  <div class="market-item"><span>سکه امامی</span><strong id="marketCoin">در حال دریافت…</strong><small>تومان</small></div>
+ </div>
+ <div class="market-meta">
+  <span id="marketUpdated">زمان آخرین دریافت: —</span>
+  <span id="marketStatus" class="market-status">منبع: داده‌های بازار ایران</span>
+ </div>
+</section>
 
  <section class="section" id="shop">
   <div class="section-head">
@@ -1557,6 +1595,61 @@ font-size:13px;box-shadow:0 4px 15px #0003;">
     }
   });
 })();
+
+/* ساعت تهران و نرخ‌های بازار ایران */
+(function(){
+ const api='https://raw.githubusercontent.com/iran-market/iran-market.github.io/main/data/popular.json';
+ const numberFormat=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
+ const timeFormat=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+ const dateFormat=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ const $id=id=>document.getElementById(id);
+ function tick(){
+  const now=new Date();
+  $id('marketClock').textContent=timeFormat.format(now);
+  $id('marketDate').textContent=dateFormat.format(now)+' · به وقت تهران';
+ }
+ function showPrice(id,item){
+  $id(id).textContent=item&&Number.isFinite(Number(item.price))?numberFormat.format(Number(item.price)):'فعلاً در دسترس نیست';
+ }
+ async function loadMarket(){
+  const status=$id('marketStatus');
+  const button=$id('marketRefresh');
+  button.disabled=true;
+  button.textContent='در حال دریافت…';
+  try{
+   const response=await fetch(api+'?v='+Date.now(),{cache:'no-store'});
+   if(!response.ok)throw new Error('HTTP '+response.status);
+   const payload=await response.json();
+   if(!payload||!Array.isArray(payload.data))throw new Error('ساختار پاسخ معتبر نیست');
+   const bySymbol=Object.fromEntries(payload.data.map(item=>[item.symbol,item]));
+   showPrice('marketUsd',bySymbol.USD_IRR_FREE);
+   showPrice('marketEur',bySymbol.EUR_IRR_FREE);
+   showPrice('marketGold',bySymbol.GOLD_18K_IRR);
+   showPrice('marketCoin',bySymbol.COIN_EMAMI_IRR);
+   const stale=Boolean(payload.meta&&payload.meta.stale)||payload.data.some(item=>item.stale);
+   const updated=(payload.meta&&payload.meta.updated_at)||payload.data[0]?.timestamp;
+   $id('marketUpdated').textContent='آخرین به‌روزرسانی منبع: '+(updated?new Date(updated).toLocaleString('fa-IR',{timeZone:'Asia/Tehran'}):'نامشخص');
+   status.textContent=stale?'هشدار: دادهٔ دریافتی ممکن است قدیمی باشد':'منبع: Iran Market Data · بازار آزاد ایران';
+   status.classList.toggle('stale',stale);
+  }catch(error){
+   console.error('Market data error:',error);
+   status.textContent='دریافت قیمت‌ها ناموفق بود؛ بعداً دوباره تلاش کنید';
+   status.classList.add('stale');
+   ['marketUsd','marketEur','marketGold','marketCoin'].forEach(id=>{
+    if($id(id).textContent==='در حال دریافت…')$id(id).textContent='فعلاً در دسترس نیست';
+   });
+  }finally{
+   button.disabled=false;
+   button.textContent='↻ به‌روزرسانی قیمت‌ها';
+  }
+ }
+ tick();
+ setInterval(tick,1000);
+ $id('marketRefresh').addEventListener('click',loadMarket);
+ loadMarket();
+ setInterval(loadMarket,30*60*1000);
+})();
+
 </script> 
 </body>
 </html>
