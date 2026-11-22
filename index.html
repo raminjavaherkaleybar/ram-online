@@ -631,6 +631,27 @@ body{font-size:14px;overflow-x:hidden}
  .hero .google-search-input,.hero .google-search-submit{font-size:8px!important;padding:3px 5px!important}
  .hero .google-search-hint{font-size:7px!important;margin-top:1px!important}
 }
+
+/* اندازه متناسب‌تر پنل نرخ‌های بازار */
+.market-panel{width:min(92%,680px)!important;max-width:680px!important;margin:10px auto 14px!important;padding:9px 11px!important;border-radius:12px!important}
+.market-top{margin-bottom:7px!important;gap:7px!important}
+.market-clock strong{font-size:17px!important}
+.market-refresh{padding:5px 9px!important;font-size:10px!important}
+.market-grid{gap:7px!important}
+.market-item{padding:7px 9px!important;border-radius:9px!important}
+.market-item span{font-size:10px!important;margin-bottom:3px!important}
+.market-item strong{font-size:13px!important;line-height:1.45!important}
+.market-item small{font-size:9px!important;margin-top:2px!important}
+.market-meta{font-size:8px!important;margin-top:7px!important;gap:4px!important}
+@media(max-width:650px){
+ .market-panel{width:94%!important;max-width:94%!important;margin:8px auto 11px!important;padding:8px!important}
+ .market-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ .market-item{padding:7px!important}
+ .market-item span{font-size:9px!important}
+ .market-item strong{font-size:12px!important}
+ .market-meta{font-size:8px!important}
+}
+
 </style>
 
 <script type="application/ld+json">
