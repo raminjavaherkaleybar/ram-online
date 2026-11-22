@@ -512,6 +512,34 @@ a{color:inherit}
  .product-body .btn{font-size:6px;padding:4px 1px}
 }
 
+
+/* Compact top announcement and header */
+.top{padding:5px 8px;font-size:10px}
+.head{min-height:60px;gap:8px}
+.brand-wrap{gap:7px}
+.brand-logo{width:44px;height:44px;border-radius:9px}
+.brand{font-size:18px;line-height:1.35}
+.brand small{font-size:8px;letter-spacing:2px}
+.head-actions{gap:5px}
+.head-actions .btn{padding:7px 10px;font-size:10px;border-radius:8px;min-height:32px;box-shadow:none}
+@media(max-width:600px){
+ .top{padding:4px 6px;font-size:9px}
+ .head{min-height:0;padding:6px 0;row-gap:5px}
+ .brand-wrap{gap:6px}
+ .brand-logo{width:38px;height:38px}
+ .brand{font-size:13px;line-height:1.35}
+ .brand small{font-size:7px;letter-spacing:1.5px}
+ .head-actions{gap:5px;width:100%;justify-content:flex-start}
+ .head-actions .btn{padding:5px 8px;font-size:9px;min-height:28px;border-radius:7px}
+}
+@media(max-width:360px){
+ .brand-logo{width:34px;height:34px}
+ .brand{font-size:11px}
+ .brand small{font-size:6px}
+ .head-actions{gap:4px}
+ .head-actions .btn{font-size:8px;padding:4px 6px;min-height:26px}
+}
+
 </style>
 
 <script type="application/ld+json">
