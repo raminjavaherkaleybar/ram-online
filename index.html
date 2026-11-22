@@ -462,8 +462,16 @@ a{color:inherit}
   <form id="checkoutForm">
    <label class="field">نام و نام خانوادگی<input id="cName" autocomplete="name" maxlength="100" required></label>
    <label class="field">شماره موبایل<input id="cMobile" type="tel" inputmode="numeric" autocomplete="tel" maxlength="11" pattern="(09|۰۹|٠٩)[0-9۰-۹٠-٩]{9}" required placeholder="09xxxxxxxxx"></label>
-   <label class="field">استان<input id="cProvince" autocomplete="address-level1" maxlength="60" required></label>
-   <label class="field">شهر<input id="cCity" autocomplete="address-level2" maxlength="60" required></label>
+   <label class="field">استان
+    <select id="cProvince" autocomplete="address-level1" required>
+     <option value="">ابتدا استان را انتخاب کنید</option>
+    </select>
+   </label>
+   <label class="field">شهر
+    <select id="cCity" autocomplete="address-level2" required disabled>
+     <option value="">ابتدا استان را انتخاب کنید</option>
+    </select>
+   </label>
    <label class="field">آدرس کامل<textarea id="cAddress" autocomplete="street-address" maxlength="700" required></textarea></label>
    <label class="field">کد پستی<input id="cPostal" inputmode="numeric" autocomplete="postal-code" maxlength="10"></label>
    <label class="field">توضیحات سفارش<textarea id="cNote" maxlength="1000" placeholder="مثلاً رنگ یا توضیح خاص سفارش (اختیاری)"></textarea></label>
@@ -526,7 +534,37 @@ function validMoney(value){
  return Number.isFinite(n)&&n>=0?n:null;
 }
 
+async function initLocationSelectors(){
+ const provinceSelect=$('cProvince');
+ const citySelect=$('cCity');
+ provinceSelect.innerHTML='<option value="">در حال دریافت فهرست استان‌ها...</option>';
+ citySelect.innerHTML='<option value="">ابتدا استان را انتخاب کنید</option>';
+ citySelect.disabled=true;
+ try{
+  const response=await fetch('./iran-locations.json',{cache:'force-cache'});
+  if(!response.ok)throw new Error('فهرست استان‌ها و شهرها دریافت نشد.');
+  const locations=await response.json();
+  if(!Array.isArray(locations.provinces)||!locations.cities)throw new Error('ساختار فهرست مکان‌ها معتبر نیست.');
+  provinceSelect.innerHTML='<option value="">استان را انتخاب کنید</option>'+
+   locations.provinces.map(p=>'<option value="'+esc(p.name)+'" data-id="'+Number(p.id)+'">'+esc(p.name)+'</option>').join('');
+  provinceSelect.addEventListener('change',()=>{
+   const selected=provinceSelect.options[provinceSelect.selectedIndex];
+   const provinceId=selected?.dataset.id;
+   const cities=provinceId?locations.cities[provinceId]||[]:[];
+   citySelect.innerHTML='<option value="">شهر را انتخاب کنید</option>'+
+    cities.map(city=>'<option value="'+esc(city)+'">'+esc(city)+'</option>').join('');
+   citySelect.disabled=!cities.length;
+  });
+ }catch(error){
+  console.error('بارگذاری فهرست استان و شهر:',error);
+  provinceSelect.innerHTML='<option value="">فهرست استان‌ها بارگذاری نشد</option>';
+  citySelect.innerHTML='<option value="">امکان دریافت فهرست شهرها نیست</option>';
+  msg('checkoutMsg','فهرست استان‌ها و شهرها بارگذاری نشد. صفحه را دوباره بارگذاری کنید.','error');
+ }
+}
+
 async function init(){
+ await initLocationSelectors();
  await loadCategories();
  await loadProducts();
  restoreCart();
