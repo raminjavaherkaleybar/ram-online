@@ -876,15 +876,30 @@ $('checkoutForm').addEventListener('submit',async e=>{
   msg('checkoutMsg','در حال بررسی موجودی انبار...');
   const ids=cart.map(x=>x.id);
   const {data:latest,error:checkError}=await db.from('catalog_products')
-   .select('id,name,stock').in('id',ids);
+   .select('id,name,stock,sale_price,discount_price').in('id',ids);
   if(checkError)throw checkError;
 
+  let priceChanged=false;
   for(const item of cart){
    const p=(latest||[]).find(x=>Number(x.id)===Number(item.id));
    if(!p||Number(p.stock||0)<item.qty){
     await loadProducts();
     throw new Error('موجودی محصول '+item.name+' کافی نیست. سبد خرید را اصلاح کنید.');
    }
+   const currentPrice=Number(p.discount_price)>0?Number(p.discount_price):Number(p.sale_price);
+   if(!Number.isFinite(currentPrice)||currentPrice<0){
+    throw new Error('قیمت محصول '+item.name+' معتبر نیست. لطفاً با فروشگاه تماس بگیرید.');
+   }
+   if(Number(item.price)!==currentPrice){
+    item.price=currentPrice;
+    priceChanged=true;
+   }
+   item.name=p.name||item.name;
+   item.stock=Number(p.stock)||0;
+  }
+  if(priceChanged){
+   renderCart();
+   throw new Error('قیمت یک یا چند محصول تغییر کرده است. مبلغ جدید سبد خرید را بررسی کنید و دوباره ثبت سفارش را بزنید.');
   }
 
   const payload={
