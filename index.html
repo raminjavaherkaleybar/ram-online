@@ -1116,6 +1116,16 @@ body{font-size:14px}
 .footer a[href^="tel:"]{color:#e5c995;text-decoration:none;white-space:nowrap}
 .footer a[href^="tel:"]:hover{text-decoration:underline}
 @media(max-width:600px){.faq-list details{padding:11px 12px}.faq-list summary{font-size:12px}.faq-list details p{font-size:11px}}
+
+/* گزارش فروش پنل مدیریت */
+#reportsTab .admin-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+#reportsTab .admin-stat{min-width:0;overflow-wrap:anywhere}
+#reportsTab .admin-stat b{font-size:16px;line-height:1.7}
+#reportsTab .notice{margin:12px 0}
+@media(max-width:600px){
+ #reportsTab .admin-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #reportsTab .admin-stat b{font-size:13px}
+}
 </style>
 
 <script type="application/ld+json">
@@ -1273,6 +1283,7 @@ body{font-size:14px}
   <div class="tabs">
    <button class="active" data-tab="productTab">مدیریت محصولات</button>
    <button data-tab="ordersTab">سفارش‌ها</button>
+   <button data-tab="reportsTab">گزارش فروش</button>
    <button data-tab="shippingTab">تنظیمات ارسال</button>
   </div>
 
@@ -1321,6 +1332,16 @@ body{font-size:14px}
    </div>
    <button class="btn light" id="refreshOrders">به‌روزرسانی سفارش‌ها</button>
    <div id="adminOrders"></div>
+  </div>
+
+  <div id="reportsTab" class="hidden">
+   <h3>گزارش فروش و عملکرد مالی</h3>
+   <p class="small muted">گزارش‌ها بر اساس سفارش‌های ثبت‌شده هستند. سود ناخالص فقط تخمینی است و با قیمت خرید فعلی کالا محاسبه می‌شود؛ برای سود دقیق هر سفارش باید قیمت خرید در زمان فروش نیز ذخیره شود.</p>
+   <div class="admin-tools">
+    <label class="field">سال شمسی گزارش<select id="reportYearFilter"><option value="all">تمام سال‌ها</option></select></label>
+    <button class="btn light" type="button" id="refreshSalesReport">به‌روزرسانی گزارش</button>
+   </div>
+   <div id="adminSalesReport"><div class="empty">برای نمایش گزارش، اطلاعات سفارش‌ها را دریافت کنید.</div></div>
   </div>
 
   <div id="shippingTab" class="hidden">
@@ -2010,8 +2031,8 @@ $('logoutBtn').onclick=async()=>{
 
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
  document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));
- ['productTab','ordersTab','shippingTab'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
- if(b.dataset.tab==='ordersTab')loadAdminOrders();
+ ['productTab','ordersTab','reportsTab','shippingTab'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
+ if(b.dataset.tab==='ordersTab'||b.dataset.tab==='reportsTab')loadAdminOrders();
  if(b.dataset.tab==='shippingTab')loadShippingSettings();
 }));
 
@@ -2195,7 +2216,7 @@ async function loadAdminOrders(){
    db.from('orders').select('*').order('created_at',{ascending:false}),
    db.from('customers').select('*'),
    db.from('order_items').select('*'),
-   db.from('products').select('id,name,code,image_url')
+   db.from('products').select('id,name,code,image_url,purchase_price')
   ]);
   for(const r of [ordersR,customersR,itemsR,productsR]){
    if(r.error)throw r.error;
@@ -2214,11 +2235,80 @@ async function loadAdminOrders(){
    }))
   }));
   renderAdminOrders();
+  renderAdminSalesReport();
  }catch(error){
   box.innerHTML='<div class="notice error">دریافت سفارش‌ها ناموفق بود: '+esc(errText(error))+'</div>';
   console.error(error);
  }
 }
+
+
+function reportDateParts(value){
+ const date=new Date(value);
+ if(!Number.isFinite(date.getTime()))return null;
+ const parts=new Intl.DateTimeFormat('en-US-u-ca-persian',{timeZone:'Asia/Tehran',year:'numeric',month:'numeric'}).formatToParts(date);
+ const year=Number(normalizeDigits(parts.find(x=>x.type==='year')?.value||'0'));
+ const month=Number(normalizeDigits(parts.find(x=>x.type==='month')?.value||'0'));
+ if(!year||month<1||month>12)return null;
+ return {year,month};
+}
+function renderAdminSalesReport(){
+ const box=$('adminSalesReport');
+ const yearSelect=$('reportYearFilter');
+ if(!box||!yearSelect)return;
+ const years=[...new Set(adminOrders.map(o=>reportDateParts(o.created_at)?.year).filter(Boolean))].sort((a,b)=>b-a);
+ const selected=yearSelect.value||'all';
+ yearSelect.innerHTML='<option value="all">تمام سال‌ها</option>'+years.map(y=>'<option value="'+y+'">'+y.toLocaleString('fa-IR')+'</option>').join('');
+ yearSelect.value=selected==='all'||years.includes(Number(selected))?selected:'all';
+ const year=yearSelect.value==='all'?null:Number(yearSelect.value);
+ const inPeriod=adminOrders.filter(o=>{
+  const p=reportDateParts(o.created_at);
+  return !year||(p&&p.year===year);
+ });
+ const valid=inPeriod.filter(o=>o.status!=='cancelled');
+ const paid=valid.filter(o=>o.payment_status==='paid');
+ const unpaid=valid.filter(o=>o.payment_status!=='paid');
+ const paidSubtotal=paid.reduce((s,o)=>s+getOrderSubtotal(o),0);
+ const paidShipping=paid.reduce((s,o)=>s+Number(o.shipping_cost||0),0);
+ const paidTotal=paid.reduce((s,o)=>s+Number(o.total_amount||0),0);
+ let estimatedProfit=0,knownCostLines=0,unknownCostLines=0;
+ paid.forEach(o=>(o.items||[]).forEach(item=>{
+  const cost=item.product?.purchase_price;
+  const qty=Number(item.quantity||0),price=Number(item.unit_price||0);
+  if(cost===null||cost===undefined||cost===''||!Number.isFinite(Number(cost))||Number(cost)<=0){unknownCostLines++;return;}
+  estimatedProfit+=(price-Number(cost))*qty;
+  knownCostLines++;
+ }));
+ const grouped={};
+ paid.forEach(o=>{
+  const p=reportDateParts(o.created_at);if(!p)return;
+  const key=p.year+'-'+String(p.month).padStart(2,'0');
+  if(!grouped[key])grouped[key]={year:p.year,month:p.month,orders:0,subtotal:0,total:0};
+  grouped[key].orders++;grouped[key].subtotal+=getOrderSubtotal(o);grouped[key].total+=Number(o.total_amount||0);
+ });
+ const rows=Object.values(grouped).sort((a,b)=>b.year-a.year||b.month-a.month);
+ const monthName=m=>new Intl.DateTimeFormat('fa-IR-u-ca-persian',{month:'long',timeZone:'Asia/Tehran'}).format(new Date(Date.UTC(2026,m-1,15,12)));
+ const stat=(value,label)=>'<div class="admin-stat"><b>'+value+'</b><span>'+label+'</span></div>';
+ box.innerHTML=
+  '<div class="admin-summary">'+
+   stat(inPeriod.length.toLocaleString('fa-IR'),'کل سفارش‌ها')+
+   stat(paid.length.toLocaleString('fa-IR'),'سفارش‌های پرداخت‌شده')+
+   stat(unpaid.length.toLocaleString('fa-IR'),'پرداخت‌نشده / در انتظار')+
+   stat(money(paidSubtotal),'فروش کالاهای پرداخت‌شده')+
+   stat(money(paidShipping),'هزینه ارسال دریافتی')+
+   stat(money(paidTotal),'مجموع دریافتی سفارش‌ها')+
+   stat(money(estimatedProfit),'سود ناخالص تخمینی')+
+   stat(unknownCostLines.toLocaleString('fa-IR'),'ردیف بدون قیمت خرید معتبر')+
+  '</div>'+
+  '<div class="notice">سود نمایش‌داده‌شده تخمینی است و فقط ردیف‌هایی را شامل می‌شود که قیمت خرید فعلی برایشان ثبت شده باشد. هزینه‌های جانبی، تخفیف‌های خارج از قیمت محصول و تغییر قیمت خرید در گذشته در آن لحاظ نشده‌اند.</div>'+
+  '<h4>فروش ماهانه سفارش‌های پرداخت‌شده</h4>'+
+  (rows.length?'<div style="overflow:auto"><table class="order-table"><thead><tr><th>ماه</th><th>تعداد سفارش</th><th>فروش کالا</th><th>مبلغ کل با ارسال</th></tr></thead><tbody>'+
+   rows.map(r=>'<tr><td>'+monthName(r.month)+' '+r.year.toLocaleString('fa-IR')+'</td><td>'+r.orders.toLocaleString('fa-IR')+'</td><td>'+money(r.subtotal)+'</td><td><b>'+money(r.total)+'</b></td></tr>').join('')+
+  '</tbody></table></div>':'<div class="empty">در این بازه سفارش پرداخت‌شده‌ای وجود ندارد.</div>')+
+  '<p class="small muted">ردیف‌های دارای قیمت خرید معتبر: '+knownCostLines.toLocaleString('fa-IR')+' مورد. سفارش‌های لغوشده در محاسبه فروش لحاظ نشده‌اند.</p>';
+}
+$('reportYearFilter')?.addEventListener('change',renderAdminSalesReport);
+$('refreshSalesReport')?.addEventListener('click',loadAdminOrders);
 
 function renderAdminOrders(){
  const box=$('adminOrders');
@@ -2335,6 +2425,7 @@ async function updateOrderShipping(id){
   order.shipping_cost=value;
   order.total_amount=newTotal;
   renderAdminOrders();
+  renderAdminSalesReport();
   alert('هزینه ارسال و مبلغ کل سفارش با موفقیت ذخیره شد.');
  }catch(error){
   console.error(error);
