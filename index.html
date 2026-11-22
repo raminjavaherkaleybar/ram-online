@@ -1488,7 +1488,14 @@ async function initLocationSelectors(){
  citySelect.innerHTML='<option value="">ابتدا استان را انتخاب کنید</option>';
  citySelect.disabled=true;
  try{
-  const response=await fetch('./iran-locations.json',{cache:'force-cache'});
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),8000);
+  let response;
+  try{
+   response=await fetch('./iran-locations.json',{cache:'force-cache',signal:controller.signal});
+  }finally{
+   clearTimeout(timeout);
+  }
   if(!response.ok)throw new Error('فهرست استان‌ها و شهرها دریافت نشد.');
   const locations=await response.json();
   if(!Array.isArray(locations.provinces)||!locations.cities)throw new Error('ساختار فهرست مکان‌ها معتبر نیست.');
@@ -1511,9 +1518,11 @@ async function initLocationSelectors(){
 }
 
 async function init(){
+ // Start catalog requests immediately so a slow province/city file cannot
+ // leave the product list stuck on its initial loading message.
+ const catalogTasks=Promise.allSettled([loadCategories(),loadProducts()]);
  await initLocationSelectors();
- await loadCategories();
- await loadProducts();
+ await catalogTasks;
  restoreCart();
  await loadShippingSettings();
  renderCart();
@@ -1544,14 +1553,23 @@ $('categories').addEventListener('click',e=>{
 });
 
 async function loadProducts(){
- const {data,error}=await db.from('catalog_products').select('*').order('created_at',{ascending:false});
- if(error){
-  $('products').innerHTML='<div class="empty">خطا در دریافت محصولات. اتصال و دسترسی catalog_products را بررسی کنید.</div>';
-  console.error(error);
-  return;
+ $('productCount').textContent='در حال دریافت محصولات...';
+ $('products').innerHTML='<div class="empty">در حال دریافت محصولات...</div>';
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),12000);
+ try{
+  const {data,error}=await db.from('catalog_products').select('*')
+   .order('created_at',{ascending:false}).abortSignal(controller.signal);
+  if(error)throw error;
+  products=data||[];
+  renderProducts();
+ }catch(error){
+  console.error('بارگذاری محصولات:',error);
+  $('productCount').textContent='دریافت محصولات ناموفق بود';
+  $('products').innerHTML='<div class="empty">دریافت محصولات انجام نشد. اتصال اینترنت را بررسی کنید و صفحه را دوباره بارگذاری کنید.</div>';
+ }finally{
+  clearTimeout(timeout);
  }
- products=data||[];
- renderProducts();
 }
 
 function normalizeSearchText(value){
@@ -2582,8 +2600,8 @@ $('adminProductSearch').addEventListener('input',renderAdminProducts);
 $('adminStockFilter').addEventListener('change',renderAdminProducts);
 
 init().catch(e=>{
- console.error(e);
- $('products').innerHTML='<div class="empty">خطا در راه‌اندازی فروشگاه. صفحه را دوباره بارگذاری کنید.</div>';
+ console.error('راه‌اندازی فروشگاه:',e);
+ msg('checkoutMsg','بخشی از امکانات فروشگاه بارگذاری نشد؛ فهرست محصولات جداگانه بارگذاری می‌شود.','error');
 });
 </script>
 <audio id="siteMusic" loop preload="none">
