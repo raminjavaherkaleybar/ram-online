@@ -1150,7 +1150,8 @@ async function sendCustomerOtp(){
   pendingCustomerPhone=toIranE164($('customerPhone').value);
   const button=$('customerSendOtp');
   button.disabled=true;
-  msg('customerPhoneMsg','در حال ارسال کد تأیید...');
+  const statusId=$('customerOtpForm').classList.contains('hidden')?'customerPhoneMsg':'customerOtpMsg';
+  msg(statusId,'در حال ارسال کد تأیید...');
   const {error}=await customerAuth.auth.signInWithOtp({
    phone:pendingCustomerPhone,
    options:{shouldCreateUser:true}
@@ -1159,11 +1160,11 @@ async function sendCustomerOtp(){
   $('customerOtpPhone').textContent=pendingCustomerPhone;
   $('customerPhoneForm').classList.add('hidden');
   $('customerOtpForm').classList.remove('hidden');
-  msg('customerPhoneMsg','کد تأیید ارسال شد.','ok');
-  msg('customerOtpMsg','کد پیامک‌شده را وارد کنید.','ok');
+  msg('customerOtpMsg','کد تأیید ارسال شد. کد پیامک‌شده را وارد کنید.','ok');
  }catch(error){
   console.error('ارسال کد ورود مشتری:',error);
-  msg('customerPhoneMsg','ارسال کد انجام نشد: '+errText(error),'error');
+  const statusId=$('customerOtpForm').classList.contains('hidden')?'customerPhoneMsg':'customerOtpMsg';
+  msg(statusId,'ارسال کد انجام نشد: '+errText(error),'error');
  }finally{
   $('customerSendOtp').disabled=false;
  }
