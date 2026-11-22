@@ -882,6 +882,38 @@ body{font-size:14px}
  .hero{min-height:170px!important;padding:12px 10px!important}
 }
 
+
+/* تنظیم نهایی: کمی کوچک‌تر شدن بنر و کادر نرخ‌های بازار */
+.hero{min-height:210px!important;padding:18px clamp(14px,2.6vw,28px)!important}
+@media(max-width:650px){
+  .hero{min-height:175px!important;padding:13px 11px!important}
+}
+@media(max-width:360px){
+  .hero{min-height:160px!important;padding:11px 9px!important}
+}
+.market-panel{
+  width: min(94%, 760px)!important;
+  max-width:760px!important;
+  margin:10px auto 15px!important;
+  padding:10px 12px!important;
+  border-radius:13px!important;
+}
+.market-top{margin-bottom:8px!important;gap:7px!important}
+.market-grid{gap:7px!important}
+.market-item{padding:8px 9px!important;border-radius:9px!important}
+.market-item span{font-size:10px!important;margin-bottom:4px!important}
+.market-item strong{font-size:13px!important;line-height:1.45!important}
+.market-item small,.market-meta{font-size:8px!important}
+@media(max-width:650px){
+  .market-panel{width:94%!important;max-width:520px!important;margin:8px auto 12px!important;padding:8px 9px!important}
+  .market-top{margin-bottom:6px!important;gap:5px!important}
+  .market-grid{gap:5px!important}
+  .market-item{padding:6px 7px!important}
+  .market-item span{font-size:9px!important}
+  .market-item strong{font-size:11px!important}
+  .market-item small,.market-meta{font-size:7px!important}
+}
+
 </style>
 
 <script type="application/ld+json">
