@@ -342,6 +342,27 @@ a{color:inherit}
  .hero .btn{padding:6px 10px;font-size:10px}
 }
 
+/* کارت تبلیغاتی بسیار کوچک‌تر؛ بدون تغییر تصویر و متن */
+.hero{
+  min-height:170px;
+  padding:12px 18px;
+  margin-top:9px;
+  border-radius:14px;
+}
+.hero-content{max-width:360px}
+.hero-tag{font-size:8px;padding:3px 7px;margin-bottom:4px}
+.hero h1{font-size:clamp(19px,2.8vw,27px);line-height:1.25;margin:0 0 4px}
+.hero p{font-size:10px;line-height:1.45;margin:0 0 7px}
+.hero .btn{padding:5px 9px;font-size:9px}
+@media(max-width:650px){
+  .hero{min-height:125px;padding:8px 10px;margin-top:7px;border-radius:11px}
+  .hero-content{max-width:100%}
+  .hero-tag{font-size:7px;padding:2px 5px;margin-bottom:3px}
+  .hero h1{font-size:17px;line-height:1.2;margin-bottom:3px}
+  .hero p{font-size:8px;line-height:1.35;margin-bottom:5px}
+  .hero .btn{padding:4px 7px;font-size:8px}
+}
+
 </style>
 
 <script type="application/ld+json">
