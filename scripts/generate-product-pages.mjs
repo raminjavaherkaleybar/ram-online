@@ -82,7 +82,7 @@ for (const p of products) {
     "<style>*{box-sizing:border-box}body{margin:0;background:#fbf8f1;color:#30271f;font-family:Vazirmatn,Tahoma,sans-serif;line-height:2}main{width:min(900px,92%);margin:35px auto;background:white;border:1px solid #eee5d7;border-radius:20px;padding:24px}img{display:block;width:100%;max-height:520px;object-fit:contain;background:#f7f2e9;border-radius:15px}h1{font-size:clamp(22px,5vw,32px);line-height:1.7}.desc{color:#6f6559;white-space:pre-line}a{display:inline-block;background:#a9854a;color:white;text-decoration:none;padding:10px 22px;border-radius:12px;font-weight:700}small{color:#887d70}@media(max-width:600px){main{padding:14px;margin:16px auto}}</style>",
     "</head><body><main><p><small>رام آنلاین | RAMIN JAVAHER</small></p>",
     "<h1>" + esc(name) + "</h1>",
-    (img ? "<img src=\"" + esc(img) + "\" alt=\"" + esc(name) + "\" loading=\"eager\" decoding=\"async\" fetchpriority=\"high\">" : ""),
+    (img ? "<img src=\"" + esc(img) + "\" width=\\"800\\" height=\\"800\\" alt=\"" + esc(name) + "\" loading=\"eager\" decoding=\"async\" fetchpriority=\"high\">" : ""),
     "<p class=\"desc\">" + esc(desc) + "</p>",
     productGuide,
     "<section><h2>قیمت و موجودی محصول</h2><p>قیمت ثبت‌شده: " + (Number.isFinite(currentPriceToman) && currentPriceToman > 0 ? Math.round(currentPriceToman).toLocaleString("fa-IR") + " تومان" : "برای اطلاع از قیمت تماس بگیرید") + "</p><p>وضعیت موجودی: " + (Number(p.stock) > 0 ? "موجود در انبار" : "در حال حاضر ناموجود") + "</p><p>برای مشاهده تصاویر محصول و تکمیل سفارش اینترنتی، وارد صفحه سفارش شوید.</p></section>",
