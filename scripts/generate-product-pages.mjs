@@ -30,7 +30,8 @@ for (const p of products) {
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) continue;
   const name = clean(p.name);
   const rawDesc = clean(p.description || p.details || p.short_description);
-  const categoryTitle = ({ "1":"گوشواره استیل رنگ ثابت", "2":"دستبند استیل رنگ ثابت", "3":"گردنبند استیل", "4":"انگشتر تمام استیل" })[String(p.id)] || name;\n  const desc = (rawDesc.length >= 70 ? rawDesc : clean("خرید " + categoryTitle + " از فروشگاه رام آنلاین؛ " + rawDesc + " مشاهده تصویر، قیمت و موجودی و ثبت سفارش اینترنتی.")).slice(0,160);
+  const categoryTitle = ({ "1":"گوشواره استیل رنگ ثابت", "2":"دستبند استیل رنگ ثابت", "3":"گردنبند استیل", "4":"انگشتر تمام استیل" })[String(p.id)] || name;
+  const desc = (rawDesc.length >= 70 ? rawDesc : clean("خرید " + categoryTitle + " از فروشگاه رام آنلاین؛ " + rawDesc + " مشاهده تصویر، قیمت و موجودی و ثبت سفارش اینترنتی.")).slice(0,160);
   const img = clean(p.image_url);
   const canonical = root + "/products/" + encodeURIComponent(id) + "/";
   const salePriceToman = Number(p.sale_price);
