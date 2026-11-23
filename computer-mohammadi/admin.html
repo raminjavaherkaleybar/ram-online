@@ -30,6 +30,7 @@
 <div class="field full"><label class="inline"><input class="check" id="active" type="checkbox"> نمایش این کالا در فروشگاه</label></div>
 </div><div class="actions"><button class="btn" id="save" type="submit">ذخیره کالا</button><button class="btn secondary" id="reset" type="button">پاک کردن فرم</button></div><div id="formMsg" class="msg"></div></form></div>
 <div class="panel"><div class="headrow"><h2>فهرست کالاها</h2><button id="refresh" class="btn secondary">به‌روزرسانی</button></div><div class="tablewrap"><table><thead><tr><th>نام کالا</th><th>دسته‌بندی</th><th>قیمت (تومان)</th><th>موجودی</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody id="productRows"><tr><td colspan="6">در حال دریافت...</td></tr></tbody></table></div></div>
+<div class="panel"><div class="headrow"><div><h2>مدیریت سفارش‌ها</h2><p class="muted">نمایش سفارش‌های ثبت‌شده و تغییر وضعیت آن‌ها</p></div><button id="refreshOrders" class="btn secondary">به‌روزرسانی سفارش‌ها</button></div><div class="tablewrap"><table><thead><tr><th>شماره سفارش</th><th>مشتری</th><th>تلفن</th><th>مبلغ کل (تومان)</th><th>تاریخ</th><th>وضعیت سفارش</th></tr></thead><tbody id="orderRows"><tr><td colspan="6">در حال دریافت...</td></tr></tbody></table></div><p class="muted">در این بخش اطلاعات سفارش‌های واقعی نمایش داده می‌شود؛ ثبت سفارش از سایت هنوز تا تعیین روش ارسال و پرداخت فعال نشده است.</p></div>
 </section>
 </main>
 <script type="module">
@@ -39,7 +40,7 @@ const SUPABASE_KEY='sb_publishable_pJ4jaKNQJA35B1kYmrtxWw_zPSuMMRB';
 const ADMIN_EMAIL='raminmkaleybar1363@gmail.com';
 const db=createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id), fa=n=>new Intl.NumberFormat('fa-IR').format(n||0);
-let categories=[],products=[];
+let categories=[],products=[],orders=[];
 function message(id,text,ok=false){$(id).textContent=text;$(id).className='msg '+(ok?'good':'bad')}
 function slug(){return 'item-'+Date.now().toString(36)}
 function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -60,19 +61,29 @@ async function loadProducts(){
  const {data,error}=await db.from('products').select('id,name,slug,sku,description,price,stock_quantity,image_url,is_active,category_id,categories(name)').order('created_at',{ascending:false});
  if(error)throw error;products=data||[];render();
 }
+async function loadOrders(){
+ const {data,error}=await db.from('orders').select('id,order_number,customer_name,customer_phone,total,status,created_at').order('created_at',{ascending:false}).limit(50);
+ if(error){message('formMsg','خطا در دریافت سفارش‌ها: '+error.message);return}
+ orders=data||[];renderOrders();
+}
+function renderOrders(){
+ const labels={pending:'در انتظار بررسی',confirmed:'تأیید شده',processing:'در حال آماده‌سازی',shipped:'ارسال شده',delivered:'تحویل شده',cancelled:'لغو شده'};
+ $('orderRows').innerHTML=orders.length?orders.map(o=>'<tr><td>'+safe(o.order_number)+'</td><td>'+safe(o.customer_name)+'</td><td>'+safe(o.customer_phone)+'</td><td>'+fa(o.total)+'</td><td>'+new Date(o.created_at).toLocaleString('fa-IR')+'</td><td><select data-order-status="'+o.id+'" aria-label="وضعیت سفارش">'+Object.entries(labels).map(([v,l])=>'<option value="'+v+'" '+(o.status===v?'selected':'')+'>'+l+'</option>').join('')+'</select></td></tr>').join(''):'<tr><td colspan="6">هنوز سفارشی ثبت نشده است.</td></tr>';
+ document.querySelectorAll('[data-order-status]').forEach(el=>el.onchange=async()=>{const id=el.dataset.orderStatus,status=el.value;el.disabled=true;const {error}=await db.from('orders').update({status,updated_at:new Date().toISOString()}).eq('id',id);el.disabled=false;if(error){message('formMsg','تغییر وضعیت سفارش انجام نشد: '+error.message);await loadOrders();return}message('formMsg','وضعیت سفارش به‌روزرسانی شد.',true)});
+}
 function render(){
  $('totalProducts').textContent=fa(products.length);$('activeProducts').textContent=fa(products.filter(p=>p.is_active).length);$('lowStock').textContent=fa(products.filter(p=>p.stock_quantity<=3).length);
  $('productRows').innerHTML=products.length?products.map(p=>'<tr><td>'+safe(p.name)+'</td><td>'+safe(p.categories?.name||'—')+'</td><td>'+fa(p.price)+'</td><td>'+fa(p.stock_quantity)+'</td><td><span class="pill '+(p.is_active?'':'off')+'">'+(p.is_active?'فعال':'پیش‌نویس')+'</span></td><td><div class="inline"><button class="btn secondary" data-edit="'+p.id+'">ویرایش</button><button class="btn danger" data-delete="'+p.id+'">حذف</button></div></td></tr>').join(''):'<tr><td colspan="6">هنوز کالایی ثبت نشده است. محصولات واقعی را از فرم بالا اضافه کنید.</td></tr>';
  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editProduct(b.dataset.edit));document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteProduct(b.dataset.delete));
 }
-async function loadAll(){try{await loadCategories();await loadProducts()}catch(e){message('formMsg','خطا در دریافت اطلاعات: '+e.message)}}
+async function loadAll(){try{await loadCategories();await loadProducts();await loadOrders()}catch(e){message('formMsg','خطا در دریافت اطلاعات: '+e.message)}}
 function clearForm(){$('productForm').reset();$('productId').value='';$('stock').value='0';$('formTitle').textContent='ثبت کالای جدید';$('save').textContent='ذخیره کالا'}
 function editProduct(id){const p=products.find(x=>x.id===id);if(!p)return;$('productId').value=p.id;$('name').value=p.name;$('category').value=p.category_id||'';$('price').value=p.price;$('stock').value=p.stock_quantity;$('sku').value=p.sku||'';$('image').value=p.image_url||'';$('description').value=p.description||'';$('active').checked=p.is_active;$('formTitle').textContent='ویرایش کالا';$('save').textContent='ذخیره تغییرات';window.scrollTo({top:0,behavior:'smooth'})}
 async function deleteProduct(id){const p=products.find(x=>x.id===id);if(!p||!confirm('کالای «'+p.name+'» حذف شود؟'))return;const {error}=await db.from('products').delete().eq('id',id);if(error){message('formMsg','حذف انجام نشد: '+error.message);return}await loadProducts();message('formMsg','کالا حذف شد.',true)}
 $('login').onclick=async()=>{const email=$('email').value.trim().toLowerCase(),password=$('password').value;if(email!==ADMIN_EMAIL){message('loginMsg','ایمیل مدیر صحیح نیست.');return}if(!password){message('loginMsg','رمز عبور را وارد کنید.');return}$('login').disabled=true;message('loginMsg','در حال ورود... ',true);const {data,error}=await db.auth.signInWithPassword({email,password});$('login').disabled=false;if(error){message('loginMsg','ورود ناموفق بود: '+error.message);return}await enter(data.session)};
 $('logout').onclick=async()=>{await db.auth.signOut();showLogin();message('loginMsg','از حساب خارج شدید.',true)};
 $('productForm').onsubmit=async e=>{e.preventDefault();const id=$('productId').value;const name=$('name').value.trim();const price=Number($('price').value),stock=Number($('stock').value);if(!name||!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0){message('formMsg','نام، قیمت و موجودی را درست وارد کنید.');return}const row={name,slug:id?(products.find(p=>p.id===id)?.slug||slug()):slug(),category_id:$('category').value||null,price,stock_quantity:stock,sku:$('sku').value.trim()||null,image_url:$('image').value.trim()||null,description:$('description').value.trim()||null,is_active:$('active').checked};$('save').disabled=true;const result=id?await db.from('products').update(row).eq('id',id):await db.from('products').insert(row);$('save').disabled=false;if(result.error){message('formMsg','ذخیره انجام نشد: '+result.error.message);return}clearForm();await loadProducts();message('formMsg','اطلاعات کالا با موفقیت ذخیره شد.',true)};
-$('reset').onclick=clearForm;$('refresh').onclick=loadAll;
+$('reset').onclick=clearForm;$('refresh').onclick=loadAll;$('refreshOrders').onclick=loadOrders;
 db.auth.onAuthStateChange((_event,session)=>{if(session)enter(session);else showLogin()});
 const {data:{session}}=await db.auth.getSession();if(session)await enter(session);
 </script>
