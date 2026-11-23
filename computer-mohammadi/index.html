@@ -37,44 +37,69 @@ footer{margin-top:35px;background:#101b2d;color:#d5e1f0;padding:30px 0 18px}.foo
  <div class="hero-art"><div class="device-stack"><div class="device phone"></div><div class="device laptop"></div></div></div>
 </div></section>
 <section class="section wrap" id="categories"><div class="section-head"><div><h2>دسته‌بندی محصولات</h2><p>سریع‌تر محصول موردنظرت را پیدا کن</p></div></div><div class="categories" id="categoryGrid"></div></section>
-<section class="section wrap" id="products"><div class="section-head"><div><h2>محصولات فروشگاه</h2><p>نمونه چیدمان محصولات؛ موجودی و قیمت نهایی بعداً از پنل مدیریت ثبت می‌شود</p></div></div>
+<section class="section wrap" id="products"><div class="section-head"><div><h2>محصولات فروشگاه</h2><p>محصولات و قیمت‌ها مستقیماً از موجودی واقعی فروشگاه خوانده می‌شوند</p></div></div>
  <div class="toolbar"><div class="filters" id="filters"></div><select class="sort" id="sort"><option value="default">مرتب‌سازی پیش‌فرض</option><option value="name">نام محصول</option></select></div>
  <div class="products" id="productGrid"></div>
- <div class="note">توجه: این نسخه، پیش‌نمایش اولیه طراحی فروشگاه است. محصولات و قیمت‌های این صفحه نمونه هستند؛ ثبت سفارش واقعی، پرداخت و مدیریت انبار پس از اتصال پایگاه داده اختصاصی فعال می‌شود.</div>
+ <div class="note">قیمت و موجودی کالاها از پایگاه داده اختصاصی فروشگاه خوانده می‌شود. ثبت سفارش و پرداخت آنلاین در مرحله بعد فعال خواهد شد.</div>
 </section>
 <section class="section wrap" id="benefits"><div class="section-head"><div><h2>تجربه خرید بهتر</h2><p>فروشگاه برای استفاده راحت در موبایل و کامپیوتر طراحی شده است</p></div></div><div class="features"><div class="feature"><i>🛍️</i><div><strong>تنوع محصولات</strong><small>دسته‌بندی منظم کالاها</small></div></div><div class="feature"><i>📦</i><div><strong>بررسی موجودی</strong><small>نمایش وضعیت موجودی پس از راه‌اندازی</small></div></div><div class="feature"><i>🔒</i><div><strong>خرید مطمئن</strong><small>اتصال امن در مرحله نهایی</small></div></div><div class="feature"><i>📱</i><div><strong>طراحی واکنش‌گرا</strong><small>مناسب موبایل و دسکتاپ</small></div></div></div></section>
 </main>
 <footer id="contact"><div class="wrap"><div class="footgrid"><div><h3>کامپیوتر محمدی</h3><p>فروشگاه لوازم جانبی موبایل و کامپیوتر. هدف ما فراهم کردن تجربه‌ای ساده و قابل اعتماد برای خرید تجهیزات دیجیتال است.</p></div><div><h3>دسترسی سریع</h3><p><a href="#products">مشاهده محصولات</a></p><p><a href="#categories">دسته‌بندی کالاها</a></p></div><div><h3>اطلاعات فروشگاه</h3><p>آدرس و شماره تماس پس از تأیید اطلاعات فروشگاه درج خواهد شد.</p></div></div><div class="copyright">© تمامی حقوق برای فروشگاه کامپیوتر محمدی محفوظ است.</div></div></footer>
 </main>
-<div class="drawer-back" id="drawerBack"><aside class="drawer"><div class="drawer-head"><h3>سبد خرید آزمایشی</h3><button class="close" id="closeCart">بستن</button></div><div id="cartItems"></div><div class="note">سبد خرید در این پیش‌نمایش فقط روی همین مرورگر ذخیره می‌شود و هنوز سفارش واقعی ارسال نمی‌کند.</div></aside></div>
-<script>
-const categories=[["all","همه کالاها","🛒"],["mobile","لوازم موبایل","📱"],["cable","کابل و شارژر","🔌"],["audio","صوتی و هندزفری","🎧"],["computer","لوازم کامپیوتر","⌨️"],["storage","حافظه و ذخیره‌سازی","💾"]];
-const products=[
-{id:1,name:"کابل شارژ USB نمونه",cat:"cable",emoji:"🔌",label:"کابل و شارژر"},
-{id:2,name:"آداپتور شارژ نمونه",cat:"cable",emoji:"🔋",label:"کابل و شارژر"},
-{id:3,name:"هندزفری سیمی نمونه",cat:"audio",emoji:"🎧",label:"صوتی و هندزفری"},
-{id:4,name:"هدفون بلوتوث نمونه",cat:"audio",emoji:"🎧",label:"صوتی و هندزفری"},
-{id:5,name:"ماوس کامپیوتر نمونه",cat:"computer",emoji:"🖱️",label:"لوازم کامپیوتر"},
-{id:6,name:"کیبورد نمونه",cat:"computer",emoji:"⌨️",label:"لوازم کامپیوتر"},
-{id:7,name:"پاوربانک نمونه",cat:"mobile",emoji:"🔋",label:"لوازم موبایل"},
-{id:8,name:"فلش مموری نمونه",cat:"storage",emoji:"💾",label:"حافظه و ذخیره‌سازی"},
-{id:9,name:"اسپیکر بلوتوث نمونه",cat:"audio",emoji:"🔊",label:"صوتی و هندزفری"},
-{id:10,name:"قاب و محافظ موبایل نمونه",cat:"mobile",emoji:"📱",label:"لوازم موبایل"},
-{id:11,name:"کارت حافظه نمونه",cat:"storage",emoji:"💳",label:"حافظه و ذخیره‌سازی"},
-{id:12,name:"مبدل و رابط کامپیوتر نمونه",cat:"computer",emoji:"🔗",label:"لوازم کامپیوتر"}
-];
-let active="all",cart=JSON.parse(localStorage.getItem("mohammadiCart")||"{}");
-const fa=n=>new Intl.NumberFormat("fa-IR").format(n);
-function renderCategories(){document.getElementById("categoryGrid").innerHTML=categories.slice(1).map(c=>'<div class="cat" data-cat="'+c[0]+'"><div class="cat-icon">'+c[2]+'</div><strong>'+c[1]+'</strong></div>').join("");document.querySelectorAll(".cat").forEach(el=>el.onclick=()=>setCategory(el.dataset.cat))}
-function renderFilters(){document.getElementById("filters").innerHTML=categories.map(c=>'<button class="filter '+(active===c[0]?'active':'')+'" data-cat="'+c[0]+'">'+c[1]+'</button>').join("");document.querySelectorAll(".filter").forEach(el=>el.onclick=()=>setCategory(el.dataset.cat))}
-function renderProducts(){const q=document.getElementById("search").value.trim().toLowerCase();let list=products.filter(p=>(active==="all"||p.cat===active)&&(!q||(p.name+" "+p.label).toLowerCase().includes(q)));if(document.getElementById("sort").value==="name")list.sort((a,b)=>a.name.localeCompare(b.name,"fa"));document.getElementById("productGrid").innerHTML=list.length?list.map(p=>'<article class="product"><div class="product-visual"><span class="tag">نمونه نمایشی</span><span class="emoji">'+p.emoji+'</span></div><div class="product-body"><span class="product-cat">'+p.label+'</span><h3>'+p.name+'</h3><div class="price">قیمت: به‌زودی اعلام می‌شود</div><div class="product-actions"><button class="add" data-add="'+p.id+'">افزودن به سبد</button><button class="detail" data-detail="'+p.id+'">جزئیات</button></div></div></article>').join(""):'<div class="empty">محصولی با این مشخصات پیدا نشد.</div>';document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addToCart(+b.dataset.add));document.querySelectorAll("[data-detail]").forEach(b=>b.onclick=()=>alert("مشخصات کامل و قیمت این کالا پس از ورود اطلاعات واقعی محصول نمایش داده می‌شود."))}
-function setCategory(c){active=c;renderFilters();renderProducts()}
-function addToCart(id){cart[id]=(cart[id]||0)+1;localStorage.setItem("mohammadiCart",JSON.stringify(cart));renderCart();document.getElementById("cartCount").textContent=fa(Object.values(cart).reduce((a,b)=>a+b,0))}
-function renderCart(){const rows=Object.entries(cart).filter(([,q])=>q>0);document.getElementById("cartItems").innerHTML=rows.length?rows.map(([id,q])=>{const p=products.find(x=>x.id===+id);return '<div class="cart-row"><div><strong>'+p.name+'</strong><small>قیمت هنوز ثبت نشده</small></div><div><button class="close" data-dec="'+id+'">−</button> '+fa(q)+' <button class="close" data-inc="'+id+'">+</button></div></div>'}).join(""):'<div class="empty">سبد خرید شما خالی است.</div>';document.querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>addToCart(+b.dataset.inc));document.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{const id=b.dataset.dec;cart[id]--;if(cart[id]<=0)delete cart[id];localStorage.setItem("mohammadiCart",JSON.stringify(cart));renderCart();document.getElementById("cartCount").textContent=fa(Object.values(cart).reduce((a,b)=>a+b,0))})}
-document.getElementById("search").addEventListener("input",renderProducts);document.getElementById("sort").addEventListener("change",renderProducts);
-document.getElementById("cartBtn").onclick=()=>{document.getElementById("drawerBack").classList.add("open");document.querySelector(".drawer").classList.add("open");renderCart()};
-document.getElementById("closeCart").onclick=()=>{document.getElementById("drawerBack").classList.remove("open");document.querySelector(".drawer").classList.remove("open")};
-document.getElementById("drawerBack").onclick=e=>{if(e.target.id==="drawerBack"){e.currentTarget.classList.remove("open");document.querySelector(".drawer").classList.remove("open")}};
-renderCategories();renderFilters();renderProducts();renderCart();document.getElementById("cartCount").textContent=fa(Object.values(cart).reduce((a,b)=>a+b,0));
+<div class="drawer-back" id="drawerBack"><aside class="drawer"><div class="drawer-head"><h3>سبد خرید</h3><button class="close" id="closeCart">بستن</button></div><div id="cartItems"></div><div class="note">سبد خرید فعلاً در همین مرورگر ذخیره می‌شود؛ ثبت سفارش نهایی هنوز فعال نشده است.</div></aside></div>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.0";
+const db=createClient("https://fgfeiilkzoajguabzuex.supabase.co","sb_publishable_pJ4jaKNQJA35B1kYmrtxWw_zPSuMMRB");
+const $=id=>document.getElementById(id);
+const fa=n=>new Intl.NumberFormat("fa-IR").format(Number(n||0));
+let categories=[["all","همه کالاها","🛒"]];
+let products=[];
+let active="all";
+let cart=JSON.parse(localStorage.getItem("mohammadiCart")||"{}");
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function renderCategories(){
+ $("categoryGrid").innerHTML=categories.slice(1).map(c=>'<div class="cat" data-cat="'+safe(c[0])+'"><div class="cat-icon">'+c[2]+'</div><strong>'+safe(c[1])+'</strong></div>').join("");
+ document.querySelectorAll(".cat").forEach(el=>el.onclick=()=>setCategory(el.dataset.cat));
+}
+function renderFilters(){
+ $("filters").innerHTML=categories.map(c=>'<button class="filter '+(active===c[0]?"active":"")+'" data-cat="'+safe(c[0])+'">'+safe(c[1])+'</button>').join("");
+ document.querySelectorAll(".filter").forEach(el=>el.onclick=()=>setCategory(el.dataset.cat));
+}
+function renderProducts(){
+ const q=$("search").value.trim().toLocaleLowerCase("fa");
+ let list=products.filter(p=>(active==="all"||p.cat===active)&&(!q||(p.name+" "+p.label).toLocaleLowerCase("fa").includes(q)));
+ if($("sort").value==="name")list.sort((a,b)=>a.name.localeCompare(b.name,"fa"));
+ $("productGrid").innerHTML=list.length?list.map(p=>'<article class="product"><div class="product-visual">'+(p.image_url?'<img src="'+safe(p.image_url)+'" alt="'+safe(p.name)+'" style="max-width:100%;max-height:100%;object-fit:contain">':'<span class="emoji">'+p.emoji+'</span>')+'</div><div class="product-body"><span class="product-cat">'+safe(p.label)+'</span><h3>'+safe(p.name)+'</h3><div class="price">'+fa(p.price)+' تومان</div><div class="product-cat">موجودی: '+fa(p.stock_quantity)+'</div><div class="product-actions"><button class="add" data-add="'+p.id+'" '+(p.stock_quantity<1?"disabled":"")+'>افزودن به سبد</button><button class="detail" data-detail="'+p.id+'">جزئیات</button></div></div></article>').join(""):'<div class="empty">در حال حاضر کالای فعالی برای نمایش ثبت نشده است.</div>';
+ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addToCart(b.dataset.add));
+ document.querySelectorAll("[data-detail]").forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.detail);if(p)alert(p.name+"\n"+(p.description||"توضیحی ثبت نشده است")+"\nقیمت: "+fa(p.price)+" تومان\nموجودی: "+fa(p.stock_quantity));});
+}
+function setCategory(c){active=c;renderFilters();renderProducts();}
+function addToCart(id){const p=products.find(x=>x.id===id);if(!p||p.stock_quantity<1)return;cart[id]=Math.min(p.stock_quantity,(cart[id]||0)+1);localStorage.setItem("mohammadiCart",JSON.stringify(cart));renderCart();}
+function renderCart(){
+ const rows=Object.entries(cart).filter(([id,q])=>q>0&&products.some(p=>p.id===id));
+ $("cartItems").innerHTML=rows.length?rows.map(([id,q])=>{const p=products.find(x=>x.id===id);return '<div class="cart-row"><div><strong>'+safe(p.name)+'</strong><small>'+fa(p.price)+' تومان × '+fa(q)+'</small></div><div><button class="close" data-dec="'+id+'">−</button> '+fa(q)+' <button class="close" data-inc="'+id+'">+</button></div></div>';}).join(""):'<div class="empty">سبد خرید شما خالی است.</div>';
+ document.querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>addToCart(b.dataset.inc));
+ document.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{const id=b.dataset.dec;cart[id]--;if(cart[id]<=0)delete cart[id];localStorage.setItem("mohammadiCart",JSON.stringify(cart));renderCart();});
+ $("cartCount").textContent=fa(Object.values(cart).reduce((a,b)=>a+b,0));
+}
+async function loadCatalog(){
+ $("productGrid").innerHTML='<div class="empty">در حال دریافت محصولات فروشگاه...</div>';
+ const [cr,pr]=await Promise.all([
+  db.from("categories").select("name,slug").eq("is_active",true).order("sort_order"),
+  db.from("products").select("id,name,price,stock_quantity,image_url,description,categories(name,slug)").eq("is_active",true).order("created_at",{ascending:false})
+ ]);
+ if(cr.error||pr.error){$("productGrid").innerHTML='<div class="empty">دریافت محصولات با مشکل روبه‌رو شد. لطفاً بعداً دوباره تلاش کنید.</div>';return;}
+ categories=[["all","همه کالاها","🛒"],...(cr.data||[]).map(c=>[c.slug,c.name,"📦"])];
+ products=(pr.data||[]).map(p=>({id:p.id,name:p.name,cat:p.categories?.slug||"all",label:p.categories?.name||"سایر کالاها",emoji:"📦",price:Number(p.price),stock_quantity:Number(p.stock_quantity),image_url:p.image_url,description:p.description}));
+ for(const id of Object.keys(cart))if(!products.some(p=>p.id===id))delete cart[id];
+ localStorage.setItem("mohammadiCart",JSON.stringify(cart));
+ renderCategories();renderFilters();renderProducts();renderCart();
+}
+$("search").addEventListener("input",renderProducts);
+$("sort").addEventListener("change",renderProducts);
+$("cartBtn").onclick=()=>{$("drawerBack").classList.add("open");document.querySelector(".drawer").classList.add("open");renderCart();};
+$("closeCart").onclick=()=>{$("drawerBack").classList.remove("open");document.querySelector(".drawer").classList.remove("open");};
+$("drawerBack").onclick=e=>{if(e.target.id==="drawerBack"){e.currentTarget.classList.remove("open");document.querySelector(".drawer").classList.remove("open");}};
+loadCatalog();
 </script>
 </body></html>
