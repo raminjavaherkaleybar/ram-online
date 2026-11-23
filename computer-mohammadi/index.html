@@ -130,7 +130,7 @@ $("checkoutForm").onsubmit=async e=>{
  const btn=$("submitOrder");btn.disabled=true;btn.textContent="در حال ثبت سفارش...";
  $("checkoutMessage").textContent="در حال بررسی قیمت و موجودی...";
  try{
-  const {data,error}=await db.rpc("place_store_order",{payload});
+  const {data,error}=await db.functions.invoke("create-store-order",{body:payload});
   if(error)throw error;
   cart={};localStorage.removeItem("mohammadiCart");
   $("checkoutForm").reset();$("checkoutForm").classList.add("hidden");
