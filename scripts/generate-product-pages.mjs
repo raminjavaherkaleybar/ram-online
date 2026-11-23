@@ -88,7 +88,7 @@ for (const p of products) {
     productGuide,
     "<section><h2>قیمت و موجودی محصول</h2><p>قیمت ثبت‌شده: " + (Number.isFinite(currentPriceToman) && currentPriceToman > 0 ? Math.round(currentPriceToman).toLocaleString("fa-IR") + " تومان" : "برای اطلاع از قیمت تماس بگیرید") + "</p><p>وضعیت موجودی: " + (Number(p.stock) > 0 ? "موجود در انبار" : "در حال حاضر ناموجود") + "</p><p>برای مشاهده تصاویر محصول و تکمیل سفارش اینترنتی، وارد صفحه سفارش شوید.</p></section>",
     "<a href=\"/?product=" + encodeURIComponent(id) + "\">مشاهده محصول و ثبت سفارش</a>",
-    "<p><small>فروشگاه اینترنتی بدلیجات و زیورآلات رام آنلاین</small></p></main></body></html>"
+    "<p><small>فروشگاه اینترنتی بدلیجات و زیورآلات رام آنلاین</small></p><p><a href=\"/shipping-returns/\">روش ارسال و شرایط بازگشت کالا</a> | <a href=\"/guide/\">راهنمای خرید</a></p></main></body></html>"
   ].join("\n");
   const dir = path.join("products", id);
   await fs.mkdir(dir, { recursive: true });
@@ -98,7 +98,7 @@ for (const p of products) {
 if (!urls.length) throw new Error("No valid product IDs found; sitemap was not changed.");
 const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   '  <url><loc>' + root + '/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n' +
-  '  <url><loc>' + root + '/guide/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n' +
+  '  <url><loc>' + root + '/guide/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n' +\n  '  <url><loc>' + root + '/shipping-returns/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n' +
   urls.map(u => '  <url><loc>' + esc(u) + '</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>').join("\n") +
   '\n</urlset>\n';
 await fs.writeFile("sitemap.xml", sitemap, "utf8");
