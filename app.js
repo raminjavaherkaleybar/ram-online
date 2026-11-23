@@ -312,7 +312,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/?product=${Number(p.id)}" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/${Number(p.id)}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
