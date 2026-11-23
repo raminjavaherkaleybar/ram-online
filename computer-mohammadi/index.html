@@ -19,7 +19,7 @@ nav{border-top:1px solid #ffffff16}.navlinks{display:flex;gap:24px;overflow:auto
 .note{background:#fff8e8;border:1px solid #f3dfad;border-radius:12px;padding:12px 15px;color:#7b5b1c;font-size:12px;margin-top:17px}
 .features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.feature{background:white;border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;gap:11px;align-items:center}.feature i{font-style:normal;font-size:23px}.feature strong{display:block;font-size:12px}.feature small{color:var(--muted);font-size:10px}
 footer{margin-top:35px;background:#101b2d;color:#d5e1f0;padding:30px 0 18px}.footgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:25px}.footgrid h3{color:white;font-size:15px}.footgrid p,.footgrid a{font-size:12px;color:#afc0d6;text-decoration:none}.copyright{border-top:1px solid #ffffff20;margin-top:20px;padding-top:12px;color:#8fa3bd;font-size:11px;text-align:center}
-.drawer-back{position:fixed;inset:0;background:#07101e77;z-index:30;display:none}.drawer{position:absolute;left:0;top:0;height:100%;width:min(410px,92vw);background:white;padding:20px;overflow:auto}.drawer.open,.drawer-back.open{display:block}.drawer-head{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:#edf2f8;border-radius:9px;padding:6px 11px}.cart-row{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px}.cart-row small{display:block;color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:35px 0}
+.drawer-back{position:fixed;inset:0;background:#07101e77;z-index:30;display:none}.hidden{display:none!important}.drawer{position:absolute;left:0;top:0;height:100%;width:min(410px,92vw);background:white;padding:20px;overflow:auto}.drawer.open,.drawer-back.open{display:block}.drawer-head{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:#edf2f8;border-radius:9px;padding:6px 11px}.cart-row{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px}.cart-row small{display:block;color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:35px 0}
 @media(max-width:850px){.categories{grid-template-columns:repeat(3,1fr)}.products{grid-template-columns:repeat(3,1fr)}.features{grid-template-columns:repeat(2,1fr)}.head{flex-wrap:wrap}.brand{min-width:auto}.search{order:3;flex-basis:100%}}
 @media(max-width:560px){.topline .wrap span:last-child{display:none}.head{gap:10px}.brand strong{font-size:15px}.head-actions{margin-right:auto}.head-actions .btn{padding:8px 10px;font-size:11px}.hero-box{grid-template-columns:1fr}.hero-art{display:none}.categories{grid-template-columns:repeat(3,1fr);gap:8px}.cat{padding:12px 5px}.cat-icon{width:44px;height:44px;font-size:22px}.cat strong{font-size:11px}.products{grid-template-columns:repeat(2,1fr);gap:9px}.product-visual{height:125px}.product-visual .emoji{font-size:52px}.product-body{padding:10px}.product h3{font-size:12px}.footgrid{grid-template-columns:1fr 1fr}.footgrid>div:first-child{grid-column:1/-1}.section-head h2{font-size:18px}}
 </style>
@@ -40,13 +40,28 @@ footer{margin-top:35px;background:#101b2d;color:#d5e1f0;padding:30px 0 18px}.foo
 <section class="section wrap" id="products"><div class="section-head"><div><h2>محصولات فروشگاه</h2><p>محصولات و قیمت‌ها مستقیماً از موجودی واقعی فروشگاه خوانده می‌شوند</p></div></div>
  <div class="toolbar"><div class="filters" id="filters"></div><select class="sort" id="sort"><option value="default">مرتب‌سازی پیش‌فرض</option><option value="name">نام محصول</option></select></div>
  <div class="products" id="productGrid"></div>
- <div class="note">قیمت و موجودی کالاها از پایگاه داده اختصاصی فروشگاه خوانده می‌شود. ثبت سفارش و پرداخت آنلاین در مرحله بعد فعال خواهد شد.</div>
+ <div class="note">قیمت و موجودی کالاها از پایگاه داده اختصاصی فروشگاه خوانده می‌شود. ثبت درخواست سفارش فعال است؛ هزینه ارسال و شیوه پرداخت پس از هماهنگی با فروشگاه نهایی می‌شود.</div>
 </section>
 <section class="section wrap" id="benefits"><div class="section-head"><div><h2>تجربه خرید بهتر</h2><p>فروشگاه برای استفاده راحت در موبایل و کامپیوتر طراحی شده است</p></div></div><div class="features"><div class="feature"><i>🛍️</i><div><strong>تنوع محصولات</strong><small>دسته‌بندی منظم کالاها</small></div></div><div class="feature"><i>📦</i><div><strong>بررسی موجودی</strong><small>نمایش وضعیت موجودی پس از راه‌اندازی</small></div></div><div class="feature"><i>🔒</i><div><strong>خرید مطمئن</strong><small>اتصال امن در مرحله نهایی</small></div></div><div class="feature"><i>📱</i><div><strong>طراحی واکنش‌گرا</strong><small>مناسب موبایل و دسکتاپ</small></div></div></div></section>
 </main>
 <footer id="contact"><div class="wrap"><div class="footgrid"><div><h3>کامپیوتر محمدی</h3><p>فروشگاه لوازم جانبی موبایل و کامپیوتر. هدف ما فراهم کردن تجربه‌ای ساده و قابل اعتماد برای خرید تجهیزات دیجیتال است.</p></div><div><h3>دسترسی سریع</h3><p><a href="#products">مشاهده محصولات</a></p><p><a href="#categories">دسته‌بندی کالاها</a></p></div><div><h3>اطلاعات فروشگاه</h3><p>آدرس و شماره تماس پس از تأیید اطلاعات فروشگاه درج خواهد شد.</p></div></div><div class="copyright">© تمامی حقوق برای فروشگاه کامپیوتر محمدی محفوظ است.</div></div></footer>
 </main>
-<div class="drawer-back" id="drawerBack"><aside class="drawer"><div class="drawer-head"><h3>سبد خرید</h3><button class="close" id="closeCart">بستن</button></div><div id="cartItems"></div><div class="note">سبد خرید فعلاً در همین مرورگر ذخیره می‌شود؛ ثبت سفارش نهایی هنوز فعال نشده است.</div></aside></div>
+<div class="drawer-back" id="drawerBack"><aside class="drawer"><div class="drawer-head"><h3>سبد خرید</h3><button class="close" id="closeCart">بستن</button></div><div id="cartItems"></div><div id="cartSummary" class="cart-row"><strong>جمع کالاها</strong><strong id="cartTotal">۰ تومان</strong></div>
+<button id="checkoutToggle" class="btn btn-primary" style="width:100%;margin-top:12px">ادامه و ثبت سفارش</button>
+<form id="checkoutForm" class="hidden" style="margin-top:16px">
+<h3>اطلاعات تحویل سفارش</h3>
+<label>نام و نام خانوادگی *</label><input id="customerName" required maxlength="120" autocomplete="name" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>شماره موبایل *</label><input id="customerPhone" required inputmode="tel" autocomplete="tel" maxlength="16" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>استان</label><input id="province" maxlength="80" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>شهر *</label><input id="city" required maxlength="80" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>نشانی کامل *</label><textarea id="shippingAddress" required minlength="8" maxlength="600" rows="3" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"></textarea>
+<label>کد پستی</label><input id="postalCode" inputmode="numeric" maxlength="20" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>توضیحات سفارش</label><textarea id="customerNote" maxlength="500" rows="2" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"></textarea>
+<div class="note">فعلاً سفارش به‌صورت «در انتظار تأیید» ثبت می‌شود. فروشگاه پیش از پرداخت، هزینه ارسال و روش پرداخت را با شما هماهنگ می‌کند؛ در این مرحله هیچ مبلغی آنلاین دریافت نمی‌شود.</div>
+<button id="submitOrder" type="submit" class="btn btn-primary" style="width:100%;margin-top:12px">ثبت درخواست سفارش</button>
+<div id="checkoutMessage" role="status" style="font-size:13px;margin-top:10px"></div>
+</form>
+<div class="note">قیمت کالاها هنگام ثبت سفارش دوباره از پایگاه داده بررسی می‌شود و موجودی به‌صورت موقت برای سفارش رزرو می‌شود.</div></aside></div>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.0";
 const db=createClient("https://fgfeiilkzoajguabzuex.supabase.co","sb_publishable_pJ4jaKNQJA35B1kYmrtxWw_zPSuMMRB");
@@ -80,7 +95,10 @@ function renderCart(){
  $("cartItems").innerHTML=rows.length?rows.map(([id,q])=>{const p=products.find(x=>x.id===id);return '<div class="cart-row"><div><strong>'+safe(p.name)+'</strong><small>'+fa(p.price)+' تومان × '+fa(q)+'</small></div><div><button class="close" data-dec="'+id+'">−</button> '+fa(q)+' <button class="close" data-inc="'+id+'">+</button></div></div>';}).join(""):'<div class="empty">سبد خرید شما خالی است.</div>';
  document.querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>addToCart(b.dataset.inc));
  document.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{const id=b.dataset.dec;cart[id]--;if(cart[id]<=0)delete cart[id];localStorage.setItem("mohammadiCart",JSON.stringify(cart));renderCart();});
+ const total=rows.reduce((sum,[id,q])=>sum+products.find(p=>p.id===id).price*q,0);
+ $("cartTotal").textContent=fa(total)+" تومان";
  $("cartCount").textContent=fa(Object.values(cart).reduce((a,b)=>a+b,0));
+ $("checkoutToggle").disabled=!rows.length;
 }
 async function loadCatalog(){
  $("productGrid").innerHTML='<div class="empty">در حال دریافت محصولات فروشگاه...</div>';
@@ -95,6 +113,36 @@ async function loadCatalog(){
  localStorage.setItem("mohammadiCart",JSON.stringify(cart));
  renderCategories();renderFilters();renderProducts();renderCart();
 }
+$("checkoutToggle").onclick=()=>{if(!Object.keys(cart).length){$("checkoutMessage").textContent="سبد خرید خالی است.";return}$("checkoutForm").classList.toggle("hidden");};
+$("checkoutForm").onsubmit=async e=>{
+ e.preventDefault();
+ const rows=Object.entries(cart).filter(([id,q])=>q>0&&products.some(p=>p.id===id));
+ if(!rows.length){$("checkoutMessage").textContent="سبد خرید خالی است.";return;}
+ const payload={
+  customer_name:$("customerName").value.trim(),
+  customer_phone:$("customerPhone").value.trim(),
+  province:$("province").value.trim(),
+  city:$("city").value.trim(),
+  shipping_address:$("shippingAddress").value.trim(),
+  postal_code:$("postalCode").value.trim(),
+  customer_note:$("customerNote").value.trim(),
+  items:rows.map(([product_id,quantity])=>({product_id,quantity}))
+ };
+ const btn=$("submitOrder");btn.disabled=true;btn.textContent="در حال ثبت سفارش...";
+ $("checkoutMessage").textContent="در حال بررسی قیمت و موجودی...";
+ try{
+  const {data,error}=await db.rpc("place_store_order",{payload});
+  if(error)throw error;
+  cart={};localStorage.removeItem("mohammadiCart");
+  $("checkoutForm").reset();$("checkoutForm").classList.add("hidden");
+  $("checkoutMessage").textContent="سفارش شماره "+fa(data.order_number)+" با موفقیت ثبت شد. فروشگاه برای هماهنگی ارسال و پرداخت با شما تماس می‌گیرد.";
+  $("checkoutMessage").style.color="#087443";
+  await loadCatalog();
+ }catch(err){
+  $("checkoutMessage").textContent=err.message||"ثبت سفارش انجام نشد؛ لطفاً دوباره تلاش کنید.";
+  $("checkoutMessage").style.color="#b42318";
+ }finally{btn.disabled=false;btn.textContent="ثبت درخواست سفارش";}
+};
 $("search").addEventListener("input",renderProducts);
 $("sort").addEventListener("change",renderProducts);
 $("cartBtn").onclick=()=>{$("drawerBack").classList.add("open");document.querySelector(".drawer").classList.add("open");renderCart();};
