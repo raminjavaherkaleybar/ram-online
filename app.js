@@ -496,6 +496,7 @@ function addToCart(id){
 function renderCart(){
  persistCart();
  $('cartCount').textContent=cart.reduce((a,x)=>a+x.qty,0).toLocaleString('fa-IR');
+ $('checkoutBtn').disabled=!cart.length;
  $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartline">
   <div><b>${esc(x.name)}</b><div class="small">${money(x.price)} × ${x.qty}</div></div>
   <div class="row">
@@ -510,8 +511,9 @@ function renderCart(){
  const shipping=cart.length?defaultShippingCost:0;
  $('cartTotal').innerHTML=`
   <div>جمع محصولات: ${money(subtotal)}</div>
-  <div>هزینه ارسال: ${money(shipping)}</div>
-  <div style="border-top:1px solid #dfd2bf;margin-top:7px;padding-top:7px">مبلغ قابل پرداخت: ${money(subtotal+shipping)}</div>`;
+  <div>هزینه ارسال پایه: ${money(shipping)}</div>
+  <div style="border-top:1px solid #dfd2bf;margin-top:7px;padding-top:7px">جمع فعلی سبد: ${money(subtotal+shipping)}</div>
+  <div class="small muted" style="font-weight:400;line-height:1.9;margin-top:6px">هزینه ارسال نمایش‌داده‌شده پایه است؛ اگر با توجه به مقصد یا مشخصات بسته تغییر کند، مبلغ نهایی پیش از پرداخت با شما هماهنگ می‌شود.</div>`;
 }
 
 function changeQty(id,d){
