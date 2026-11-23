@@ -137,7 +137,14 @@ $("checkoutForm").onsubmit=async e=>{
   if(error)throw error;
   cart={};localStorage.removeItem("mohammadiCart");
   $("checkoutForm").reset();$("checkoutForm").classList.add("hidden");
-  $("checkoutMessage").textContent="سفارش شماره "+fa(data.order_number)+" با موفقیت ثبت شد. روش انتخابی ارسال: "+(selectedShippingMethod==="tipax"?"تیپاکس":"پست")+". هزینه ارسال و پرداخت پس از هماهنگی با فروشگاه نهایی می‌شود.";
+  $("checkoutMessage").textContent="سفارش شماره "+fa(data.order_number)+" با موفقیت ثبت شد. روش ارسال: "+(selectedShippingMethod==="tipax"?"تیپاکس":"پست")+". برای دریافت شماره کارت، ربات روبیکا را باز کنید و دکمه «ارسال شماره موبایل من» را بزنید؛ همان شماره‌ای را ارسال کنید که در سفارش ثبت کردید. هزینه ارسال پس از هماهنگی نهایی می‌شود. ";
+  const botLink=document.createElement("a");
+  botLink.href="https://rubika.ir/RaminJavaherBot";
+  botLink.target="_blank";
+  botLink.rel="noopener noreferrer";
+  botLink.textContent="ورود به ربات روبیکا";
+  botLink.style.cssText="display:inline-block;margin:8px 4px;color:#087443;font-weight:800;text-decoration:underline";
+  $("checkoutMessage").append(botLink);
   $("checkoutMessage").style.color="#087443";
   await loadCatalog();
  }catch(err){
