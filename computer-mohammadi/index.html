@@ -136,7 +136,7 @@ $("checkoutForm").onsubmit=async e=>{
   if(error)throw error;
   cart={};localStorage.removeItem("mohammadiCart");
   $("checkoutForm").reset();$("checkoutForm").classList.add("hidden");
-  $("checkoutMessage").textContent="سفارش شماره "+fa(data.order_number)+" با موفقیت ثبت شد. فروشگاه برای هماهنگی ارسال و پرداخت با شما تماس می‌گیرد.";
+  $("checkoutMessage").textContent="سفارش شماره "+fa(data.order_number)+" با موفقیت ثبت شد. روش انتخابی ارسال: "+($("shippingMethod").value==="tipax"?"تیپاکس":"پست")+". هزینه ارسال و پرداخت پس از هماهنگی با فروشگاه نهایی می‌شود.";
   $("checkoutMessage").style.color="#087443";
   await loadCatalog();
  }catch(err){
