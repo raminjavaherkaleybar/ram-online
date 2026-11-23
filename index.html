@@ -654,11 +654,27 @@ body{font-size:14px;overflow-x:hidden}
 }
 
 
-/* نمایش کامل تصویر پس‌زمینه پنل نرخ‌های بازار */
+/* پس‌زمینه ملایم‌تر و کمی محوتر پنل نرخ‌های بازار؛ محتوا بدون تغییر */
 .market-panel{
- background-size:100% 100%!important;
- background-position:center center!important;
- background-repeat:no-repeat!important;
+ background-image:none!important;
+ background-color:#080b10!important;
+}
+.market-panel::before{
+ content:"";
+ position:absolute;
+ inset:-3px;
+ z-index:0;
+ background-image:url('/assets/ram-market-bg.webp');
+ background-position:center center;
+ background-size:cover;
+ background-repeat:no-repeat;
+ filter:blur(1.2px) brightness(.72) saturate(.82);
+ opacity:.9;
+ pointer-events:none;
+}
+.market-panel > *{
+ position:relative;
+ z-index:1;
 }
 
 
