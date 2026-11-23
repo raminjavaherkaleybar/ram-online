@@ -56,6 +56,7 @@ footer{margin-top:35px;background:#101b2d;color:#d5e1f0;padding:30px 0 18px}.foo
 <label>شهر *</label><input id="city" required maxlength="80" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
 <label>نشانی کامل *</label><textarea id="shippingAddress" required minlength="8" maxlength="600" rows="3" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"></textarea>
 <label>کد پستی</label><input id="postalCode" inputmode="numeric" maxlength="20" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px">
+<label>روش ارسال *</label><select id="shippingMethod" required style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"><option value="">انتخاب روش ارسال</option><option value="post">پست جمهوری اسلامی ایران</option><option value="tipax">تیپاکس</option></select>
 <label>توضیحات سفارش</label><textarea id="customerNote" maxlength="500" rows="2" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"></textarea>
 <div class="note">فعلاً سفارش به‌صورت «در انتظار تأیید» ثبت می‌شود. فروشگاه پیش از پرداخت، هزینه ارسال و روش پرداخت را با شما هماهنگ می‌کند؛ در این مرحله هیچ مبلغی آنلاین دریافت نمی‌شود.</div>
 <button id="submitOrder" type="submit" class="btn btn-primary" style="width:100%;margin-top:12px">ثبت درخواست سفارش</button>
@@ -124,6 +125,7 @@ $("checkoutForm").onsubmit=async e=>{
   city:$("city").value.trim(),
   shipping_address:$("shippingAddress").value.trim(),
   postal_code:$("postalCode").value.trim(),
+  shipping_method:$("shippingMethod").value,
   customer_note:$("customerNote").value.trim(),
   items:rows.map(([product_id,quantity])=>({product_id,quantity}))
  };
