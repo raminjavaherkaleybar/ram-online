@@ -59,8 +59,7 @@ footer{margin-top:35px;background:#101b2d;color:#d5e1f0;padding:30px 0 18px}.foo
 <label>توضیحات سفارش</label><textarea id="customerNote" maxlength="500" rows="2" style="width:100%;padding:10px;border:1px solid #dce4ef;border-radius:9px;margin:5px 0 10px"></textarea>
 <div class="note">فعلاً سفارش به‌صورت «در انتظار تأیید» ثبت می‌شود. فروشگاه پیش از پرداخت، هزینه ارسال و روش پرداخت را با شما هماهنگ می‌کند؛ در این مرحله هیچ مبلغی آنلاین دریافت نمی‌شود.</div>
 <button id="submitOrder" type="submit" class="btn btn-primary" style="width:100%;margin-top:12px">ثبت درخواست سفارش</button>
-<div id="checkoutMessage" role="status" style="font-size:13px;margin-top:10px"></div>
-</form>
+</form><div id="checkoutMessage" role="status" aria-live="polite" style="font-size:13px;margin-top:10px"></div>
 <div class="note">قیمت کالاها هنگام ثبت سفارش دوباره از پایگاه داده بررسی می‌شود و موجودی به‌صورت موقت برای سفارش رزرو می‌شود.</div></aside></div>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.0";
