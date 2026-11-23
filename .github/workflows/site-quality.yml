@@ -1,0 +1,99 @@
+name: Site quality checks
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-quality-checks
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check scripts/generate-product-pages.mjs
+      - name: Validate site files, product pages and sitemap
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import assert from 'node:assert/strict';
+
+          const required = [
+            'index.html',
+            'app.js',
+            'robots.txt',
+            'sitemap.xml',
+            'iran-locations.json',
+            'guide/index.html',
+            'shipping-returns/index.html'
+          ];
+          for (const file of required) {
+            assert.ok(fs.existsSync(file), `Missing required file: ${file}`);
+          }
+
+          const home = fs.readFileSync('index.html', 'utf8');
+          assert.match(home, /<html[^>]*lang="fa"[^>]*dir="rtl"/i, 'Homepage must declare Persian RTL');
+          assert.match(home, /<title>[^<]+<\/title>/i, 'Homepage title is missing');
+          assert.match(home, /<meta[^>]+name="description"/i, 'Homepage meta description is missing');
+          assert.match(home, /rel="canonical"[^>]+https:\/\/raminjavaher\.ir\//i, 'Homepage canonical is missing');
+          assert.match(home, /src="\/app\.js"[^>]*defer/i, 'Deferred storefront script is missing');
+          JSON.parse(fs.readFileSync('iran-locations.json', 'utf8'));
+
+          const robots = fs.readFileSync('robots.txt', 'utf8');
+          assert.match(robots, /Sitemap:\s*https:\/\/raminjavaher\.ir\/sitemap\.xml/i);
+
+          const sitemap = fs.readFileSync('sitemap.xml', 'utf8');
+          const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+          assert.ok(urls.includes('https://raminjavaher.ir/'), 'Homepage is missing from sitemap');
+          assert.ok(urls.includes('https://raminjavaher.ir/guide/'), 'Guide is missing from sitemap');
+          assert.ok(urls.includes('https://raminjavaher.ir/shipping-returns/'), 'Shipping policy is missing from sitemap');
+
+          for (const url of urls) {
+            const parsed = new URL(url);
+            assert.equal(parsed.origin, 'https://raminjavaher.ir', `Unexpected sitemap host: ${url}`);
+            const relative = parsed.pathname === '/' ? 'index.html' : path.join(parsed.pathname.replace(/^\//, ''), 'index.html');
+            assert.ok(fs.existsSync(relative), `Sitemap URL has no static page: ${url}`);
+          }
+
+          const shipping = fs.readFileSync('shipping-returns/index.html', 'utf8');
+          assert.match(shipping, /rel="canonical"[^>]+https:\/\/raminjavaher\.ir\/shipping-returns\//i);
+          assert.match(shipping, /انصراف از خرید/);
+          assert.match(shipping, /بازگشت کالا/);
+
+          const guide = fs.readFileSync('guide/index.html', 'utf8');
+          assert.match(guide, /rel="canonical"[^>]+https:\/\/raminjavaher\.ir\/guide\//i);
+
+          const productDirs = fs.readdirSync('products', { withFileTypes: true }).filter(entry => entry.isDirectory());
+          assert.ok(productDirs.length > 0, 'No generated product pages found');
+          for (const dir of productDirs) {
+            const file = path.join('products', dir.name, 'index.html');
+            assert.ok(fs.existsSync(file), `Missing product page: ${file}`);
+            const html = fs.readFileSync(file, 'utf8');
+            assert.match(html, /<title>[^<]+<\/title>/i, `Missing title: ${file}`);
+            assert.match(html, /name="description"/i, `Missing description: ${file}`);
+            assert.ok(html.includes(`https://raminjavaher.ir/products/${dir.name}/`), `Missing canonical product URL: ${file}`);
+            assert.ok(html.includes('/shipping-returns/'), `Missing shipping policy link: ${file}`);
+            const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/i);
+            assert.ok(jsonLd, `Missing Product structured data: ${file}`);
+            const schema = JSON.parse(jsonLd[1]);
+            assert.equal(schema['@type'], 'Product', `Wrong structured data type: ${file}`);
+            assert.ok(schema.offers && schema.offers.price && schema.offers.priceCurrency === 'IRR', `Missing valid offer price: ${file}`);
+          }
+
+          console.log(`Site checks passed: ${urls.length} sitemap URLs and ${productDirs.length} product pages validated.`);
+          NODE
