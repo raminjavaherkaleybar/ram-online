@@ -668,14 +668,18 @@ body{font-size:14px;overflow-x:hidden}
  background-position:center center;
  background-size:cover;
  background-repeat:no-repeat;
- filter:blur(1.2px) brightness(.72) saturate(.82);
- opacity:.9;
+ filter:blur(.35px) brightness(.88) saturate(.96);
+ opacity:.97;
  pointer-events:none;
 }
 .market-panel > *{
  position:relative;
  z-index:1;
 }
+
+/* کمی جمع‌وجورتر شدن کادر نرخ‌های بازار */
+.market-panel{width:min(88%,620px)!important;max-width:620px!important;padding:8px 10px!important;}
+@media(max-width:650px){.market-panel{width:91%!important;max-width:91%!important;padding:7px!important;}}
 
 
 
