@@ -1,9 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const source = await fs.readFile("index.html", "utf8");
-const url = source.match(/const SUPABASE_URL='([^']+)'/)?.[1];
-const key = source.match(/const SUPABASE_KEY='([^']+)'/)?.[1];
+// Supabase configuration lives in app.js; keep this generator aligned with the storefront.
+const source = await fs.readFile("app.js", "utf8");
+const url = source.match(/const SUPABASE_URL\s*=\s*['"]([^'"]+)['"]/)?.[1];
+const key = source.match(/const SUPABASE_KEY\s*=\s*['"]([^'"]+)['"]/)?.[1];
 if (!url || !key) throw new Error("Supabase public configuration was not found in index.html.");
 
 const productQuery = new URLSearchParams({
