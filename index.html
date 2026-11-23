@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="canonical" href="https://raminjavaher.ir/">
-<link rel="preload" as="image" href="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
+<link rel="preload" as="image" fetchpriority="high" href="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
 
 <script type="application/ld+json">
 {
@@ -104,8 +104,10 @@
 <meta name="twitter:description" content="خرید آنلاین گوشواره، انگشتر، دستبند و گردنبند زنانه از فروشگاه بدلیجات و زیورآلات رام آنلاین.">
 <meta name="twitter:image" content="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/images%20(4).jpeg">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
  --gold:#b18a50;--dark:#30271f;--cream:#fbf8f1;
@@ -881,7 +883,7 @@ body{font-size:14px;overflow-x:hidden}
 <header class="header">
  <div class="wrap head">
   <div class="brand-wrap">
-   <img class="brand-logo" src="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/%20(1).imagesaving" alt="لوگوی رام آنلاین" width="66" height="66" loading="eager" decoding="async" fetchpriority="high" onerror="this.style.display='none'">
+   <img class="brand-logo" src="https://pbexlgscthtasixhtljd.supabase.co/storage/v1/object/public/product-images/%20(1).imagesaving" alt="لوگوی رام آنلاین" width="66" height="66" loading="eager" decoding="async" fetchpriority="low" onerror="this.style.display='none'">
    <div class="brand">فروشگاه بدلیجات و زیورآلات رام آنلاین<small>RAMIN JAVAHER</small></div>
   </div>
   <div class="head-actions">
@@ -1190,6 +1192,7 @@ body{font-size:14px;overflow-x:hidden}
  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
 
