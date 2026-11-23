@@ -1360,5 +1360,12 @@ font-size:13px;box-shadow:0 4px 15px #0003;">
  .market-item{padding-top:7px!important;padding-bottom:7px!important}
 }
 </style>
+
+<style id="market-background-soften">
+/* کمی نرم‌تر شدن تصویر پس‌زمینه بخش نرخ دلار و طلا؛ متن‌ها و اعداد بدون تغییر */
+.market-panel{background-image:none!important;background-color:#080b10!important;position:relative!important;isolation:isolate!important;overflow:hidden!important}
+.market-panel::before{content:"";position:absolute;inset:-3px;z-index:0;background-image:url('/assets/ram-market-bg.webp');background-position:center 43%;background-size:cover;background-repeat:no-repeat;filter:blur(1.4px);opacity:.88;pointer-events:none}
+.market-panel>*{position:relative;z-index:1}
+</style>
 </body>
 </html>
