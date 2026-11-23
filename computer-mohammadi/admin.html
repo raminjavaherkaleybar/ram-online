@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101b2d"><title>مدیریت فروشگاه | کامپیوتر محمدی</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#172338;background:#f3f6fb}*{box-sizing:border-box}body{margin:0}.top{background:#101b2d;color:#fff;padding:18px 4%;display:flex;justify-content:space-between;align-items:center;gap:12px}.top small{color:#b9c8dc}.wrap{width:min(1100px,94%);margin:26px auto}.panel{background:#fff;border:1px solid #e4eaf2;border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 10px 30px #142b4810}.hidden{display:none!important}h1{font-size:21px;margin:0 0 5px}h2{font-size:17px;margin:0 0 16px}.muted{color:#718096;font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:12px;color:#53647a}input,select,textarea{width:100%;padding:11px;border:1px solid #dce4ef;border-radius:10px;font:inherit;background:#fff;color:#172338}textarea{min-height:75px;resize:vertical}.btn{border:0;border-radius:10px;padding:11px 17px;background:#176fe0;color:#fff;font:inherit;font-weight:bold;cursor:pointer}.btn.secondary{background:#edf3fb;color:#234}.btn.danger{background:#fff0f0;color:#b42318}.btn:disabled{opacity:.55;cursor:wait}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.msg{font-size:13px;margin-top:12px;min-height:20px}.good{color:#087443}.bad{color:#b42318}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f4f8fe;border-radius:12px;padding:15px}.stat strong{font-size:23px;display:block;color:#176fe0}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:right;border-bottom:1px solid #edf0f5;padding:12px 9px;font-size:12px}th{color:#6b7b90;background:#f8fafd}.pill{display:inline-block;background:#e9f7ef;color:#087443;padding:3px 8px;border-radius:20px}.pill.off{background:#fff2e6;color:#a34b00}.headrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.inline{display:flex;align-items:center;gap:8px}.check{width:auto}.login{max-width:460px;margin:55px auto}.note{background:#fff8e8;color:#775b1e;border:1px solid #f1dfb5;border-radius:10px;padding:12px;font-size:12px;line-height:1.9}@media(max-width:650px){.grid,.stats{grid-template-columns:1fr}.panel{padding:16px}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="top"><div><h1>پنل مدیریت کامپیوتر محمدی</h1><small>مدیریت محصولات و موجودی فروشگاه</small></div><button id="logout" class="btn secondary hidden">خروج از حساب</button></header>
+<main class="wrap">
+<section id="loginPanel" class="panel login">
+<h2>ورود مدیر فروشگاه</h2><p class="muted">برای دسترسی به اطلاعات فروشگاه، با حساب مدیر وارد شوید.</p>
+<div class="field"><label for="email">ایمیل مدیر</label><input id="email" type="email" autocomplete="username" value="raminmkaleybar1363@gmail.com"></div>
+<div class="field" style="margin-top:12px"><label for="password">رمز عبور</label><input id="password" type="password" autocomplete="current-password" placeholder="رمز عبور حساب مدیر"></div>
+<div class="actions"><button id="login" class="btn">ورود به پنل</button></div><div id="loginMsg" class="msg"></div>
+<div class="note">حساب مدیر باید یک‌بار در بخش Authentication پروژه Supabase ساخته شود. رمز عبور را در این صفحه یا برای هیچ‌کس ارسال نکنید؛ آن را فقط خودتان وارد کنید.</div>
+</section>
+<section id="appPanel" class="hidden">
+<div class="panel"><div class="headrow"><div><h2>خلاصه فروشگاه</h2><p class="muted">آمار کالاهای ثبت‌شده در پایگاه داده اختصاصی</p></div><span id="who" class="muted"></span></div><div class="stats"><div class="stat"><strong id="totalProducts">۰</strong><span>کل کالاها</span></div><div class="stat"><strong id="activeProducts">۰</strong><span>کالاهای فعال در سایت</span></div><div class="stat"><strong id="lowStock">۰</strong><span>کالای کم‌موجودی (۳ عدد یا کمتر)</span></div></div></div>
+<div class="panel"><h2 id="formTitle">ثبت کالای جدید</h2><form id="productForm"><input type="hidden" id="productId"><div class="grid">
+<div class="field"><label for="name">نام کالا *</label><input id="name" required maxlength="150" placeholder="مثلاً شارژر فست"></div>
+<div class="field"><label for="category">دسته‌بندی *</label><select id="category" required></select></div>
+<div class="field"><label for="price">قیمت (تومان) *</label><input id="price" type="number" min="0" step="1" required placeholder="قیمت واقعی کالا"></div>
+<div class="field"><label for="stock">تعداد موجودی *</label><input id="stock" type="number" min="0" step="1" required value="0"></div>
+<div class="field"><label for="sku">کد کالا (اختیاری)</label><input id="sku" maxlength="80"></div>
+<div class="field"><label for="image">لینک تصویر (اختیاری)</label><input id="image" type="url" placeholder="https://..."></div>
+<div class="field full"><label for="description">توضیحات کالا</label><textarea id="description"></textarea></div>
+<div class="field full"><label class="inline"><input class="check" id="active" type="checkbox"> نمایش این کالا در فروشگاه</label></div>
+</div><div class="actions"><button class="btn" id="save" type="submit">ذخیره کالا</button><button class="btn secondary" id="reset" type="button">پاک کردن فرم</button></div><div id="formMsg" class="msg"></div></form></div>
+<div class="panel"><div class="headrow"><h2>فهرست کالاها</h2><button id="refresh" class="btn secondary">به‌روزرسانی</button></div><div class="tablewrap"><table><thead><tr><th>نام کالا</th><th>دسته‌بندی</th><th>قیمت (تومان)</th><th>موجودی</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody id="productRows"><tr><td colspan="6">در حال دریافت...</td></tr></tbody></table></div></div>
+</section>
+</main>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.86.0';
+const SUPABASE_URL='https://fgfeiilkzoajguabzuex.supabase.co';
+const SUPABASE_KEY='sb_publishable_pJ4jaKNQJA35B1kYmrtxWw_zPSuMMRB';
+const ADMIN_EMAIL='raminmkaleybar1363@gmail.com';
+const db=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id), fa=n=>new Intl.NumberFormat('fa-IR').format(n||0);
+let categories=[],products=[];
+function message(id,text,ok=false){$(id).textContent=text;$(id).className='msg '+(ok?'good':'bad')}
+function slug(){return 'item-'+Date.now().toString(36)}
+function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function enter(session){
+ const user=session?.user;
+ if(!user){showLogin();return}
+ if((user.email||'').toLowerCase()!==ADMIN_EMAIL){await db.auth.signOut();showLogin();message('loginMsg','این حساب اجازه مدیریت فروشگاه را ندارد.');return}
+ $('loginPanel').classList.add('hidden');$('appPanel').classList.remove('hidden');$('logout').classList.remove('hidden');$('who').textContent='مدیر: '+user.email;
+ await loadAll();
+}
+function showLogin(){$('loginPanel').classList.remove('hidden');$('appPanel').classList.add('hidden');$('logout').classList.add('hidden')}
+async function loadCategories(){
+ const {data,error}=await db.from('categories').select('id,name').eq('is_active',true).order('sort_order');
+ if(error)throw error;categories=data||[];
+ $('category').innerHTML=categories.map(c=>'<option value="'+c.id+'">'+safe(c.name)+'</option>').join('');
+}
+async function loadProducts(){
+ const {data,error}=await db.from('products').select('id,name,slug,sku,description,price,stock_quantity,image_url,is_active,category_id,categories(name)').order('created_at',{ascending:false});
+ if(error)throw error;products=data||[];render();
+}
+function render(){
+ $('totalProducts').textContent=fa(products.length);$('activeProducts').textContent=fa(products.filter(p=>p.is_active).length);$('lowStock').textContent=fa(products.filter(p=>p.stock_quantity<=3).length);
+ $('productRows').innerHTML=products.length?products.map(p=>'<tr><td>'+safe(p.name)+'</td><td>'+safe(p.categories?.name||'—')+'</td><td>'+fa(p.price)+'</td><td>'+fa(p.stock_quantity)+'</td><td><span class="pill '+(p.is_active?'':'off')+'">'+(p.is_active?'فعال':'پیش‌نویس')+'</span></td><td><div class="inline"><button class="btn secondary" data-edit="'+p.id+'">ویرایش</button><button class="btn danger" data-delete="'+p.id+'">حذف</button></div></td></tr>').join(''):'<tr><td colspan="6">هنوز کالایی ثبت نشده است. محصولات واقعی را از فرم بالا اضافه کنید.</td></tr>';
+ document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editProduct(b.dataset.edit));document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteProduct(b.dataset.delete));
+}
+async function loadAll(){try{await loadCategories();await loadProducts()}catch(e){message('formMsg','خطا در دریافت اطلاعات: '+e.message)}}
+function clearForm(){$('productForm').reset();$('productId').value='';$('stock').value='0';$('formTitle').textContent='ثبت کالای جدید';$('save').textContent='ذخیره کالا'}
+function editProduct(id){const p=products.find(x=>x.id===id);if(!p)return;$('productId').value=p.id;$('name').value=p.name;$('category').value=p.category_id||'';$('price').value=p.price;$('stock').value=p.stock_quantity;$('sku').value=p.sku||'';$('image').value=p.image_url||'';$('description').value=p.description||'';$('active').checked=p.is_active;$('formTitle').textContent='ویرایش کالا';$('save').textContent='ذخیره تغییرات';window.scrollTo({top:0,behavior:'smooth'})}
+async function deleteProduct(id){const p=products.find(x=>x.id===id);if(!p||!confirm('کالای «'+p.name+'» حذف شود؟'))return;const {error}=await db.from('products').delete().eq('id',id);if(error){message('formMsg','حذف انجام نشد: '+error.message);return}await loadProducts();message('formMsg','کالا حذف شد.',true)}
+$('login').onclick=async()=>{const email=$('email').value.trim().toLowerCase(),password=$('password').value;if(email!==ADMIN_EMAIL){message('loginMsg','ایمیل مدیر صحیح نیست.');return}if(!password){message('loginMsg','رمز عبور را وارد کنید.');return}$('login').disabled=true;message('loginMsg','در حال ورود... ',true);const {data,error}=await db.auth.signInWithPassword({email,password});$('login').disabled=false;if(error){message('loginMsg','ورود ناموفق بود: '+error.message);return}await enter(data.session)};
+$('logout').onclick=async()=>{await db.auth.signOut();showLogin();message('loginMsg','از حساب خارج شدید.',true)};
+$('productForm').onsubmit=async e=>{e.preventDefault();const id=$('productId').value;const name=$('name').value.trim();const price=Number($('price').value),stock=Number($('stock').value);if(!name||!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0){message('formMsg','نام، قیمت و موجودی را درست وارد کنید.');return}const row={name,slug:id?(products.find(p=>p.id===id)?.slug||slug()):slug(),category_id:$('category').value||null,price,stock_quantity:stock,sku:$('sku').value.trim()||null,image_url:$('image').value.trim()||null,description:$('description').value.trim()||null,is_active:$('active').checked};$('save').disabled=true;const result=id?await db.from('products').update(row).eq('id',id):await db.from('products').insert(row);$('save').disabled=false;if(result.error){message('formMsg','ذخیره انجام نشد: '+result.error.message);return}clearForm();await loadProducts();message('formMsg','اطلاعات کالا با موفقیت ذخیره شد.',true)};
+$('reset').onclick=clearForm;$('refresh').onclick=loadAll;
+db.auth.onAuthStateChange((_event,session)=>{if(session)enter(session);else showLogin()});
+const {data:{session}}=await db.auth.getSession();if(session)await enter(session);
+</script>
+</body></html>
