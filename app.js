@@ -70,7 +70,7 @@ async function loadCustomerOrders(){
     '<p>تاریخ ثبت: '+esc(date)+'</p>'+
     '<p>تعداد کالا: '+quantity.toLocaleString('fa-IR')+'</p>'+
     '<p>مبلغ کل: <b>'+money(o.total)+'</b></p>'+
-    '<p>هزینه ارسال: '+money(o.shipping_fee)+'</p>'+
+    '<p>هزینه ارسال: '+(Number(o.shipping_fee)>0?money(o.shipping_fee):'پس از هماهنگی با فروشگاه')+'</p>'+
     '<p>کد رهگیری: '+(o.shipping_tracking_code?'<b>'+esc(o.shipping_tracking_code)+'</b>':'هنوز ثبت نشده')+'</p>'+
     '</article>';
   }).join('');
@@ -660,8 +660,8 @@ $('checkoutForm').addEventListener('submit',async e=>{
    $('orderSuccess').innerHTML=`سفارش شما با موفقیت ثبت شد.<br>
     شماره سفارش: <b>${esc(orderId)}</b><br>
     جمع محصولات: ${money(Number(result.subtotal??subtotal))}<br>
-    هزینه ارسال: ${money(savedShipping)}<br>
-    مبلغ نهایی: <b>${money(savedTotal)}</b><br>
+    هزینه ارسال: ${savedShipping>0?money(savedShipping):'پس از هماهنگی با فروشگاه'}<br>
+    مبلغ نهایی: <b>${savedShipping>0?money(savedTotal):'پس از تعیین هزینه ارسال اعلام می‌شود'}</b><br>
     
     این شماره را برای پیگیری نگه دارید.
     ${result.rubika_link_code ? '<hr><b>اتصال خودکار به ربات روبیکا</b><br>برای اتصال حساب و دریافت اطلاعات پرداخت، روی دکمه زیر بزنید:<br><a class="btn" style="display:inline-block;text-decoration:none;margin:10px 0" href="https://rubika.ir/RaminJavaherBot?start=' + encodeURIComponent(result.rubika_link_code) + '" target="_blank" rel="noopener">اتصال به ربات و دریافت اطلاعات پرداخت</a><br><details><summary class="small" style="cursor:pointer">اگر دکمه کار نکرد، کد را دستی وارد کنید</summary><b dir="ltr" style="font-size:15px;letter-spacing:1px;word-break:break-all">' + esc(result.rubika_link_code) + '</b></details><br><small>این کد فقط ۱۰ دقیقه اعتبار دارد و یک‌بار قابل استفاده است.</small>' : ''}`;
@@ -703,7 +703,7 @@ $('trackingForm').addEventListener('submit',async e=>{
    <h3>اطلاعات سفارش شماره ${esc(order.order_number)}</h3>
    <p><b>وضعیت سفارش:</b> ${esc(statusLabel(order.status))}</p>
    <p><b>تاریخ ثبت:</b> ${esc(date)}</p>
-   <p><b>هزینه ارسال:</b> ${money(order.shipping_fee)}</p>
+   <p><b>هزینه ارسال:</b> ${Number(order.shipping_fee)>0?money(order.shipping_fee):'پس از هماهنگی با فروشگاه'}</p>
    <p><b>مبلغ نهایی سفارش:</b> ${money(order.total)}</p>
    <p><b>کد رهگیری پستی:</b> ${order.shipping_tracking_code?esc(order.shipping_tracking_code):'هنوز ثبت نشده است'}</p>
   </div>`;
@@ -1076,7 +1076,7 @@ function renderAdminOrders(){
     <div>مشتری: <b>${esc(c.full_name||'نامشخص')}</b> | موبایل: <b>${esc(c.phone||c.mobile||'—')}</b></div>
     <div>تاریخ ثبت: ${esc(date)}</div>
    </div>
-   <div class="small">جمع محصولات: ${money(subtotal)} | هزینه ارسال: ${money(o.shipping_fee)} | مبلغ کل: <b>${money(o.total)}</b></div>
+   <div class="small">جمع محصولات: ${money(subtotal)} | هزینه ارسال: ${Number(o.shipping_fee)>0?money(o.shipping_fee):'در انتظار هماهنگی'} | مبلغ کل: <b>${money(o.total)}</b></div>
    <div class="shipping-box">
     <b>تغییر هزینه ارسال همین سفارش</b>
     <div class="row">
