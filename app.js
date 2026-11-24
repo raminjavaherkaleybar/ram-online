@@ -1237,7 +1237,7 @@ function printOrder(id){
  <meta charset="utf-8">
  <title>سفارش ${esc(o.order_number)}</title>
  <body style="font-family:Tahoma,Arial;padding:25px;color:#30271f">
- <h2>فروشگاه بدلیجات و زیورآلات رام تک</h2>
+ <h2>فروشگاه لوازم جانبی موبایل و کامپیوتر رام تک</h2>
  <p>RAM TAK</p>
  <hr>
  <h3>فاکتور سفارش شماره ${esc(o.order_number)}</h3>
