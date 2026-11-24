@@ -312,13 +312,13 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/products/${'${p.id}'}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${Number(p.id)})"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/${'${p.id}'}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${'${p.id}'})"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
     <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد باقی‌مانده`:'ناموجود'}</div>
-    <button class="btn light" style="width:100%;margin-bottom:7px" onclick="openProduct(${Number(p.id)})">مشاهده جزئیات و تصاویر</button>
-    <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${Number(p.id)})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
+    <button class="btn light" style="width:100%;margin-bottom:7px" onclick="openProduct(${'${p.id}'})">مشاهده جزئیات و تصاویر</button>
+    <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${'${p.id}'})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
    </div>
   </article>`;
  }).join(''):'<div class="empty">محصولی با این مشخصات پیدا نشد. عبارت جستجو یا دسته‌بندی را تغییر دهید.</div>';
@@ -405,8 +405,8 @@ function openProduct(id,updateHistory=true){
     <div class="detail-description">${esc(description)}</div>
     <div class="detail-actions">
      <div class="detail-qty"><button type="button" onclick="changeDetailQty(-1)">−</button><b id="detailQty">۱</b><button type="button" onclick="changeDetailQty(1,${stock})">+</button></div>
-     <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart(${Number(p.id)})">افزودن به سبد خرید</button>
-      <button class="btn light" type="button" onclick="shareProduct(${Number(p.id)})">اشتراک‌گذاری محصول</button>
+     <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart(${'${p.id}'})">افزودن به سبد خرید</button>
+      <button class="btn light" type="button" onclick="shareProduct(${'${p.id}'})">اشتراک‌گذاری محصول</button>
     </div>
    </div>
   </div>`;
@@ -427,7 +427,7 @@ function changeDetailQty(delta,max=999){
  el.textContent=Math.max(1,Math.min(Number(max)||999,current+delta)).toLocaleString('fa-IR');
 }
 function addDetailToCart(id){
- const p=products.find(x=>String(x.id)===Number(id));if(!p)return;
+ const p=products.find(x=>String(x.id)===String(id));if(!p)return;
  const qty=Number(normalizeDigits($('detailQty')?.textContent||'1'))||1;
  for(let i=0;i<qty;i++)addToCart(id);
  $('cartModal').classList.remove('hidden');
@@ -502,8 +502,8 @@ function renderCart(){
   <div class="row">
    <button class="btn light" onclick="changeQty(${'${x.id}'},-1)">−</button>
    ${x.qty}
-   <button class="btn light" onclick="changeQty(${Number(x.id)},1)">+</button>
-   <button class="btn red" onclick="removeCart(${Number(x.id)})">×</button>
+   <button class="btn light" onclick="changeQty(${'${x.id}'},1)">+</button>
+   <button class="btn red" onclick="removeCart(${'${x.id}'})">×</button>
   </div>
  </div>`).join(''):'<div class="empty">سبد خرید شما خالی است.</div>';
 
@@ -519,7 +519,7 @@ function renderCart(){
 function changeQty(id,d){
  const x=cart.find(a=>String(a.id)===String(id));
  if(!x)return;
- const p=products.find(a=>Number(a.id)===Number(id));
+ const p=products.find(a=>String(a.id)===String(id));
  const stock=Number(p?.stock??x.stock??0);
  if(d>0&&x.qty>=stock){alert('موجودی کافی نیست.');return}
  x.qty+=d;
@@ -803,7 +803,6 @@ $('productForm').addEventListener('submit',async e=>{
   const id=$('editId').value;
   const record={
    name:$('pName').value.trim(),
-   code:$('pCode').value.trim()||null,
    category_id:$('pCategory').value||null,
    slug:(normalizeSearchText($('pName').value).replace(/[^\u0600-\u06FFa-z0-9]+/gi,'-').replace(/^-|-$/g,'')||'product')+'-'+crypto.randomUUID().slice(0,8),
    price:Number($('pPrice').value),
@@ -885,9 +884,9 @@ function renderAdminProducts(){
     <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${stock.toLocaleString('fa-IR')}</div>
     <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span> <span class="badge ${stockClass}">${stockLabel}</span>
    </div>
-   <button class="btn light" onclick="openEdit(${Number(p.id)})">ویرایش / موجودی</button>
-   <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${Number(p.id)},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
-   <button class="btn red" onclick="deleteProduct(${Number(p.id)})">حذف</button>
+   <button class="btn light" onclick="openEdit(${'${p.id}'})">ویرایش / موجودی</button>
+   <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${'${p.id}'},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
+   <button class="btn red" onclick="deleteProduct(${'${p.id}'})">حذف</button>
   </div>`;
  }).join('');
 }
@@ -1023,7 +1022,7 @@ function renderAdminSalesReport(){
   const p=reportDateParts(o.created_at);if(!p)return;
   const key=p.year+'-'+String(p.month).padStart(2,'0');
   if(!grouped[key])grouped[key]={year:p.year,month:p.month,orders:0,subtotal:0,total:0};
-  grouped[key].orders++;grouped[key].subtotal+=getOrderSubtotal(o);grouped[key].total+=Number(o.total_amount||0);
+  grouped[key].orders++;grouped[key].subtotal+=getOrderSubtotal(o);grouped[key].total+=Number(o.total||0);
  });
  const rows=Object.values(grouped).sort((a,b)=>b.year-a.year||b.month-a.month);
  const persianMonths=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
@@ -1202,7 +1201,7 @@ async function updateOrderTracking(id){
   if(error)throw error;
 
   const order=adminOrders.find(o=>String(o.id)===String(id));
-  if(order)order.shipping_tracking_code=trackingCode||null;order.tracking_code=trackingCode||null;
+  if(order){order.shipping_tracking_code=trackingCode||null;order.tracking_code=trackingCode||null;}
 
   alert('کد رهگیری با موفقیت ذخیره شد.');
 
