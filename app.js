@@ -48,7 +48,7 @@ async function loadCustomerOrders(){
    return;
   }
   const {data:orders,error:ordersError}=await customerAuth.from('orders')
-   .select('id,customer_id,total,shipping_fee,status,shipping_tracking_code,created_at,payment_status')
+   .select('id,order_number,customer_id,total,shipping_fee,status,shipping_tracking_code,created_at,payment_status')
    .in('customer_id',customerIds).order('created_at',{ascending:false}).limit(100);
   if(ordersError)throw ordersError;
   if(!orders||!orders.length){
@@ -65,7 +65,7 @@ async function loadCustomerOrders(){
    const quantity=orderLines.reduce((sum,i)=>sum+Number(i.quantity||0),0);
    const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR'):'—';
    return '<article class="order-card">'+
-    '<h5>سفارش شماره '+esc(o.id)+'</h5>'+
+    '<h5>سفارش شماره '+esc(o.order_number)+'</h5>'+
     '<p>وضعیت: <b>'+esc(customerStatusLabel(o.status))+'</b></p>'+
     '<p>تاریخ ثبت: '+esc(date)+'</p>'+
     '<p>تعداد کالا: '+quantity.toLocaleString('fa-IR')+'</p>'+
@@ -312,13 +312,13 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/products/${'${p.id}'}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct(${'${p.id}'})"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/'${p.id}'/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct('${p.id}')"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
     <div class="stock ${stock<=0?'out':''}">${stock>0?`موجود در انبار: ${stock.toLocaleString('fa-IR')} عدد باقی‌مانده`:'ناموجود'}</div>
-    <button class="btn light" style="width:100%;margin-bottom:7px" onclick="openProduct(${'${p.id}'})">مشاهده جزئیات و تصاویر</button>
-    <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart(${'${p.id}'})">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
+    <button class="btn light" style="width:100%;margin-bottom:7px" onclick="openProduct('${p.id}')">مشاهده جزئیات و تصاویر</button>
+    <button class="btn" ${stock<=0?'disabled':''} onclick="addToCart('${p.id}')">${stock<=0?'ناموجود':'افزودن به سبد خرید'}</button>
    </div>
   </article>`;
  }).join(''):'<div class="empty">محصولی با این مشخصات پیدا نشد. عبارت جستجو یا دسته‌بندی را تغییر دهید.</div>';
@@ -405,8 +405,8 @@ function openProduct(id,updateHistory=true){
     <div class="detail-description">${esc(description)}</div>
     <div class="detail-actions">
      <div class="detail-qty"><button type="button" onclick="changeDetailQty(-1)">−</button><b id="detailQty">۱</b><button type="button" onclick="changeDetailQty(1,${stock})">+</button></div>
-     <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart(${'${p.id}'})">افزودن به سبد خرید</button>
-      <button class="btn light" type="button" onclick="shareProduct(${'${p.id}'})">اشتراک‌گذاری محصول</button>
+     <button class="btn" ${stock<=0?'disabled':''} onclick="addDetailToCart('${p.id}')">افزودن به سبد خرید</button>
+      <button class="btn light" type="button" onclick="shareProduct('${p.id}')">اشتراک‌گذاری محصول</button>
     </div>
    </div>
   </div>`;
@@ -500,10 +500,10 @@ function renderCart(){
  $('cartItems').innerHTML=cart.length?cart.map(x=>`<div class="cartline">
   <div><b>${esc(x.name)}</b><div class="small">${money(x.price)} × ${x.qty}</div></div>
   <div class="row">
-   <button class="btn light" onclick="changeQty(${'${x.id}'},-1)">−</button>
+   <button class="btn light" onclick="changeQty('${x.id}',-1)">−</button>
    ${x.qty}
-   <button class="btn light" onclick="changeQty(${'${x.id}'},1)">+</button>
-   <button class="btn red" onclick="removeCart(${'${x.id}'})">×</button>
+   <button class="btn light" onclick="changeQty('${x.id}',1)">+</button>
+   <button class="btn red" onclick="removeCart('${x.id}')">×</button>
   </div>
  </div>`).join(''):'<div class="empty">سبد خرید شما خالی است.</div>';
 
@@ -884,9 +884,9 @@ function renderAdminProducts(){
     <div class="small">کد: ${esc(p.code||'—')} | دسته: ${esc(categoryName(p))} | قیمت: ${money(p.sale_price)} | موجودی: ${stock.toLocaleString('fa-IR')}</div>
     <span class="badge">${p.is_active?'فعال':'غیرفعال'}</span> <span class="badge ${stockClass}">${stockLabel}</span>
    </div>
-   <button class="btn light" onclick="openEdit(${'${p.id}'})">ویرایش / موجودی</button>
-   <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct(${'${p.id}'},${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
-   <button class="btn red" onclick="deleteProduct(${'${p.id}'})">حذف</button>
+   <button class="btn light" onclick="openEdit('${p.id}')">ویرایش / موجودی</button>
+   <button class="btn ${p.is_active?'red':'green'}" onclick="toggleProduct('${p.id}',${!p.is_active})">${p.is_active?'غیرفعال‌کردن':'فعال‌کردن'}</button>
+   <button class="btn red" onclick="deleteProduct('${p.id}')">حذف</button>
   </div>`;
  }).join('');
 }
@@ -1062,7 +1062,7 @@ function renderAdminOrders(){
  if(!adminOrders.length){box.innerHTML='<div class="empty">هنوز سفارشی ثبت نشده است.</div>';return}
  const filtered=adminOrders.filter(o=>{
   const c=o.customer||{};
-  const searchable=normalizeDigits([o.id,c.full_name,c.mobile].join(' ').toLowerCase());
+  const searchable=normalizeDigits([o.order_number,o.id,c.full_name,c.mobile].join(' ').toLowerCase());
   return (!search||searchable.includes(search))&&(status==='all'||o.status===status);
  });
  if(!filtered.length){box.innerHTML='<div class="empty">سفارشی با این جست‌وجو یا فیلتر پیدا نشد.</div>';return}
@@ -1071,7 +1071,7 @@ function renderAdminOrders(){
   const date=o.created_at?new Date(o.created_at).toLocaleString('fa-IR',{dateStyle:'short',timeStyle:'short'}):'—';
   const subtotal=getOrderSubtotal(o);
   return `<article class="order-card" id="order-card-${esc(o.id)}">
-   <div class="order-top"><b>سفارش شماره ${esc(o.id)}</b><span class="badge">${esc(statusLabel(o.status))}</span></div>
+   <div class="order-top"><b>سفارش شماره ${esc(o.order_number)}</b><span class="badge">${esc(statusLabel(o.status))}</span></div>
    <div class="order-meta small">
     <div>مشتری: <b>${esc(c.full_name||'نامشخص')}</b> | موبایل: <b>${esc(c.phone||c.mobile||'—')}</b></div>
     <div>تاریخ ثبت: ${esc(date)}</div>
@@ -1118,7 +1118,7 @@ function showOrderDetails(id){
   </tr>`).join('');
 
  const subtotal=getOrderSubtotal(o);
- area.innerHTML=`<h4>جزئیات سفارش ${esc(o.id)}</h4>
+ area.innerHTML=`<h4>جزئیات سفارش ${esc(o.order_number)}</h4>
   <p><b>تاریخ و ساعت ثبت:</b> ${esc(o.created_at?new Date(o.created_at).toLocaleString('fa-IR',{dateStyle:'full',timeStyle:'short'}):'—')}</p>
   <p><b>نام مشتری:</b> ${esc(c.full_name||'—')}</p>
   <p><b>موبایل:</b> <a href="tel:${esc(c.phone||c.mobile||'')}">${esc(c.mobile||'—')}</a></p>
@@ -1235,12 +1235,12 @@ function printOrder(id){
  w.document.write(`<!doctype html>
  <html lang="fa" dir="rtl">
  <meta charset="utf-8">
- <title>سفارش ${esc(id)}</title>
+ <title>سفارش ${esc(o.order_number)}</title>
  <body style="font-family:Tahoma,Arial;padding:25px;color:#30271f">
  <h2>فروشگاه بدلیجات و زیورآلات رام تک</h2>
  <p>RAM TAK</p>
  <hr>
- <h3>فاکتور سفارش شماره ${esc(id)}</h3>
+ <h3>فاکتور سفارش شماره ${esc(o.order_number)}</h3>
  <p>مشتری: ${esc(c.full_name||'—')} - موبایل: ${esc(c.mobile||'—')}</p>
  <p>آدرس: ${esc(c.address||'—')}، ${esc(c.city||'')}</p>
  <p>استان: ${esc(c.province||'—')} | کد پستی: ${esc(c.postal_code||'—')}</p>
