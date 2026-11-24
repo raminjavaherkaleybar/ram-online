@@ -218,7 +218,7 @@ async function initLocationSelectors(){
   const locations=await response.json();
   if(!Array.isArray(locations.provinces)||!locations.cities)throw new Error('ساختار فهرست مکان‌ها معتبر نیست.');
   provinceSelect.innerHTML='<option value="">استان را انتخاب کنید</option>'+
-   locations.provinces.map(p=>'<option value="'+esc(p.name)+'" data-id="'+'${p.id}'+'">'+esc(p.name)+'</option>').join('');
+   locations.provinces.map(p=>'<option value="'+esc(p.name)+'" data-id="'+esc(p.id)+'">'+esc(p.name)+'</option>').join('');
   provinceSelect.addEventListener('change',()=>{
    const selected=provinceSelect.options[provinceSelect.selectedIndex];
    const provinceId=selected?.dataset.id;
@@ -536,6 +536,20 @@ $('cartOpen').onclick=()=>{
  renderCart();
 };
 $('cartClose').onclick=()=>$('cartModal').classList.add('hidden');
+
+/* دسترس‌پذیری پنجره‌ها: بستن با کلیک روی پس‌زمینه یا کلید Escape */
+['cartModal','loginModal','customerModal'].forEach(id=>{
+ const modal=$(id);
+ if(!modal)return;
+ modal.addEventListener('click',event=>{
+  if(event.target===modal)modal.classList.add('hidden');
+ });
+});
+document.addEventListener('keydown',event=>{
+ if(event.key!=='Escape')return;
+ ['cartModal','loginModal','customerModal'].forEach(id=>$(id)?.classList.add('hidden'));
+});
+
 
 async function loadShippingSettings(){
  try{
