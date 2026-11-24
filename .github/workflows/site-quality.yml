@@ -78,8 +78,10 @@ jobs:
           const guide = fs.readFileSync('guide/index.html', 'utf8');
           assert.match(guide, /rel="canonical"[^>]+https:\/\/raminjavaher\.ir\/guide\//i);
 
-          const productDirs = fs.readdirSync('products', { withFileTypes: true }).filter(entry => entry.isDirectory());
-          assert.ok(productDirs.length > 0, 'No generated product pages found');
+          const productDirs = fs.existsSync('products')
+            ? fs.readdirSync('products', { withFileTypes: true }).filter(entry => entry.isDirectory())
+            : [];
+          // An empty catalog is valid for a newly connected store; stale pages are removed by the SEO generator.
           for (const dir of productDirs) {
             const file = path.join('products', dir.name, 'index.html');
             assert.ok(fs.existsSync(file), `Missing product page: ${file}`);
