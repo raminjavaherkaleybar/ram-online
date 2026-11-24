@@ -333,7 +333,7 @@ function productGallery(p){
  const urls=[p.image_url,...extra].map(x=>typeof x==='string'?x:(x?.url||x?.image_url||'')).filter(Boolean);
  return [...new Set(urls)];
 }
-const HOME_SEO={title:document.title,description:document.querySelector('meta[name="description"]')?.content||'فروشگاه رام آنلاین؛ خرید اینترنتی بدلیجات و زیورآلات زنانه.',canonical:'https://raminjavaher.ir/'};
+const HOME_SEO={title:document.title,description:document.querySelector('meta[name="description"]')?.content||'فروشگاه رام تک؛ خرید اینترنتی بدلیجات و زیورآلات زنانه.',canonical:'https://raminjavaher.ir/'};
 function setMeta(selector,attribute,value){
  let el=document.querySelector(selector);
  if(!el){
@@ -346,11 +346,11 @@ function setMeta(selector,attribute,value){
 }
 function setProductSEO(p){
  let description=String(p.description||p.details||p.short_description||'').replace(/\s+/g,' ').trim();
- if(description.length<70)description=(description+' خرید '+String(p.name||'این محصول')+' از فروشگاه رام آنلاین؛ مشاهده تصاویر، قیمت و ثبت سفارش اینترنتی.').trim();
+ if(description.length<70)description=(description+' خرید '+String(p.name||'این محصول')+' از فروشگاه رام تک؛ مشاهده تصاویر، قیمت و ثبت سفارش اینترنتی.').trim();
  description=description.slice(0,160);
  const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(p.id));
  const images=productGallery(p),image=images[0]||'';
- document.title=p.name+' | خرید از رام آنلاین';
+ document.title=p.name+' | خرید از رام تک';
  setMeta('meta[name="description"]','content',description);
  const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=url;
  setMeta('meta[property="og:type"]','content','product');
@@ -370,11 +370,11 @@ function resetHomeSEO(){
  setMeta('meta[name="description"]','content',HOME_SEO.description);
  const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=HOME_SEO.canonical;
  setMeta('meta[property="og:type"]','content','website');
- setMeta('meta[property="og:title"]','content','فروشگاه بدلیجات و زیورآلات رام آنلاین | خرید زیورآلات زنانه');
- setMeta('meta[property="og:description"]','content','فروشگاه بدلیجات و زیورآلات رام آنلاین؛ خرید آنلاین گوشواره، انگشتر، دستبند و گردنبند زنانه. مشاهده مدل‌ها و ثبت سفارش اینترنتی.');
+ setMeta('meta[property="og:title"]','content','فروشگاه بدلیجات و زیورآلات رام تک | خرید زیورآلات زنانه');
+ setMeta('meta[property="og:description"]','content','فروشگاه بدلیجات و زیورآلات رام تک؛ خرید آنلاین گوشواره، انگشتر، دستبند و گردنبند زنانه. مشاهده مدل‌ها و ثبت سفارش اینترنتی.');
  setMeta('meta[property="og:url"]','content',HOME_SEO.canonical);
- setMeta('meta[name="twitter:title"]','content','فروشگاه بدلیجات و زیورآلات رام آنلاین | RAMIN JAVAHER');
- setMeta('meta[name="twitter:description"]','content','خرید آنلاین بدلیجات و زیورآلات زنانه از فروشگاه بدلیجات و زیورآلات رام آنلاین؛ RAMIN JAVAHER.');
+ setMeta('meta[name="twitter:title"]','content','فروشگاه بدلیجات و زیورآلات رام تک | RAM TAK');
+ setMeta('meta[name="twitter:description"]','content','خرید آنلاین بدلیجات و زیورآلات زنانه از فروشگاه بدلیجات و زیورآلات رام تک؛ RAM TAK.');
  document.getElementById('productSeoSchema')?.remove();
 }
 function syncProductRoute(){
@@ -435,7 +435,7 @@ function addDetailToCart(id){
 async function shareProduct(id){
  const p=products.find(x=>String(x.id)===String(id));
  const url='https://raminjavaher.ir/?product='+encodeURIComponent(String(id));
- const shareData={title:(p?.name||'محصول')+' | رام آنلاین',text:'مشاهده مشخصات و ثبت سفارش در رام آنلاین',url};
+ const shareData={title:(p?.name||'محصول')+' | رام تک',text:'مشاهده مشخصات و ثبت سفارش در رام تک',url};
  try{
   if(navigator.share){await navigator.share(shareData);return;}
   if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);alert('لینک محصول کپی شد؛ می‌توانید آن را برای مشتری ارسال کنید.');return;}
@@ -1238,8 +1238,8 @@ function printOrder(id){
  <meta charset="utf-8">
  <title>سفارش ${esc(id)}</title>
  <body style="font-family:Tahoma,Arial;padding:25px;color:#30271f">
- <h2>فروشگاه بدلیجات و زیورآلات رام آنلاین</h2>
- <p>RAMIN JAVAHER</p>
+ <h2>فروشگاه بدلیجات و زیورآلات رام تک</h2>
+ <p>RAM TAK</p>
  <hr>
  <h3>فاکتور سفارش شماره ${esc(id)}</h3>
  <p>مشتری: ${esc(c.full_name||'—')} - موبایل: ${esc(c.mobile||'—')}</p>
