@@ -312,7 +312,7 @@ function renderProducts(){
  $('products').innerHTML=list.length?list.map(p=>{
   const stock=Number(p.stock||0);
   return `<article class="product">
-   <a class="product-image" href="/products/'${p.id}'/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct('${p.id}')"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
+   <a class="product-image" href="/products/${p.id}/" aria-label="مشاهده ${esc(p.name)}" onclick="event.preventDefault();openProduct('${p.id}')"><img src="${esc(p.image_url||'')}" width="800" height="800" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"></a>
    <div class="product-body">
     <h3>${esc(p.name)}</h3>
     <div class="price">${money(productPrice(p))}${Number(p.discount_price)>0?` <span class="old">${money(p.sale_price)}</span>`:''}</div>
@@ -370,11 +370,11 @@ function resetHomeSEO(){
  setMeta('meta[name="description"]','content',HOME_SEO.description);
  const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=HOME_SEO.canonical;
  setMeta('meta[property="og:type"]','content','website');
- setMeta('meta[property="og:title"]','content','فروشگاه بدلیجات و زیورآلات رام تک | خرید زیورآلات زنانه');
- setMeta('meta[property="og:description"]','content','فروشگاه بدلیجات و زیورآلات رام تک؛ خرید آنلاین گوشواره، انگشتر، دستبند و گردنبند زنانه. مشاهده مدل‌ها و ثبت سفارش اینترنتی.');
+ setMeta('meta[property="og:title"]','content','فروشگاه لوازم جانبی موبایل و کامپیوتر رام تک');
+ setMeta('meta[property="og:description"]','content','فروشگاه رام تک؛ خرید آنلاین کابل، شارژر، هندزفری، کیبورد، ماوس و لوازم جانبی موبایل و کامپیوتر.');
  setMeta('meta[property="og:url"]','content',HOME_SEO.canonical);
- setMeta('meta[name="twitter:title"]','content','فروشگاه بدلیجات و زیورآلات رام تک | RAM TAK');
- setMeta('meta[name="twitter:description"]','content','خرید آنلاین بدلیجات و زیورآلات زنانه از فروشگاه بدلیجات و زیورآلات رام تک؛ RAM TAK.');
+ setMeta('meta[name="twitter:title"]','content','فروشگاه لوازم جانبی موبایل و کامپیوتر رام تک | RAM TAK');
+ setMeta('meta[name="twitter:description"]','content','خرید آنلاین کابل، شارژر، هندزفری و تجهیزات کامپیوتر از فروشگاه رام تک؛ RAM TAK.');
  document.getElementById('productSeoSchema')?.remove();
 }
 function syncProductRoute(){
